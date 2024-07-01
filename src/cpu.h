@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "bus.h"
+#include <stdbool.h>
 
 //HARDWARE REGISTER
 
@@ -99,11 +100,14 @@ void cpu_link_bus(Cpu* cpu, Bus* bus);
 void cpu_fetch_instruction(Cpu* cpu);
 void cpu_execute_instruction(Cpu* cpu);
 
+uint8_t cpu_getPCImm8(Cpu* cpu);
+uint16_t cpu_getPCImm16(Cpu* cpu);
+
 void cpu_setFlag(Cpu* cpu, uint8_t flag);
 void cpu_clearFlag(Cpu* cpu, uint8_t flag);
-void cpu_checkFlagN(Cpu* cpu);
-void cpu_checkFlagZ(Cpu* cpu);
-void cpu_checkFlagH(Cpu* cpu);
-void cpu_checkFlagC(Cpu* cpu);
+void cpu_checkFlag(Cpu* cpu, uint8_t flag, bool condition);
+uint8_t cpu_getFlag(Cpu* cpu, uint8_t flag);
+
+
 
 #endif //__CPU_H__
