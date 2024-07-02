@@ -40,16 +40,41 @@ void cpu_instr_ADD16(Cpu* cpu, uint16_t value)
         exit(1);
     
     uint32_t res = cpu->HL.r16 + value;
-    uint16_t resFinal = (uint16_t)res;
 
     cpu_clearFlag(cpu, N_FLAG);
     cpu_checkFlag(cpu, H_FLAG, (((cpu->HL.r16 & 0xFFF) + (value & 0xFFF)) & 0x1000));
     cpu_checkFlag(cpu, C_FLAG, (res & 0x10000));
 
-    cpu->HL.r16 = resFinal;
+    cpu->HL.r16 = (uint16_t)res;
 }
 
-void cpu_instr_ADDe8(Cpu* cpu, uint8_t value);
+void cpu_instr_ADDe8(Cpu* cpu, int8_t value)
+{
+    if (!cpu)
+        exit(1);
+
+    uint32_t res = cpu->SP + value;
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->SP & 0xF) + (value & 0xF)) & 0x10));
+    cpu_checkFlag(cpu, C_FLAG, (res & 0x100));
+
+    cpu->SP = (uint16_t)res;
+}
+
+void cpu_instr_AND(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->AF.r8.hi &= value;
+
+    cpu_checkFlag(cpu, Z_FLAG, (cpu->AF.r8.hi == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_setFlag(cpu, H_FLAG);
+    cpu_clearFlag(cpu, C_FLAG);
+}
 
 
 

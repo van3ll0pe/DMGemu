@@ -343,14 +343,38 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x9E: break;
         case 0x9F: break;
 
-        case 0xA0: break;
-        case 0xA1: break;
-        case 0xA2: break;
-        case 0xA3: break;
-        case 0xA4: break;
-        case 0xA5: break;
-        case 0xA6: break;
-        case 0xA7: break;
+        case 0xA0:  //AND A, B
+                    cpu_instr_AND(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA1:  //AND A,  C
+                    cpu_instr_AND(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA2:  //AND A, D
+                    cpu_instr_AND(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA3:  //AND A, E
+                    cpu_instr_AND(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA4:  //AND A, H
+                    cpu_instr_AND(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA5:  //AND A, L
+                    cpu_instr_AND(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA6:  //AND A, [HL]
+                    cpu_instr_AND(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0xA7:  //AND A, A
+                    cpu_instr_AND(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0xA8: break;
         case 0xA9: break;
         case 0xAA: break;
@@ -418,9 +442,15 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xE1: break;
         case 0xE2: break;
         case 0xE5: break;
-        case 0xE6: break;
+        case 0xE6:  //AND A, n8
+                    cpu_instr_AND(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xE7: break;
-        case 0xE8: break;
+        case 0xE8:  //ADD SP, e8
+                    cpu_instr_ADDe8(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 16;
+                    break;
         case 0xE9: break;
         case 0xEA: break;
         case 0xEE: break;
