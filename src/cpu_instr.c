@@ -76,5 +76,44 @@ void cpu_instr_AND(Cpu* cpu, uint8_t value)
     cpu_clearFlag(cpu, C_FLAG);
 }
 
+void cpu_instr_CP(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t res = cpu->AF.r8.hi - value;
 
+    cpu_checkFlag(cpu, Z_FLAG, (res == 0));
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->AF.r8.hi & 0xF) - (value & 0xF)) & 0x10));
+    cpu_checkFlag(cpu, C_FLAG, (cpu->AF.r8.hi < value));
+}
+
+void cpu_instr_DEC8(Cpu* cpu, uint8_t* value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t res = (*value) - 1;
+
+    cpu_checkFlag(cpu, Z_FLAG, (res == 0));
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, ((((*value) & 0xF) - 1) & 0x10));
+
+    *value = res;
+}
+
+void cpu_instr_DECHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+
+    uint8_t res = cpu->bus->bus_read8(cpu->bus->component, address) - 1;
+
+    cpu_checkFlag(cpu, Z_FLAG, (res == 0));
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, ((((cpu->bus->bus_read8(cpu->bus->component, address)) & 0xF) - 1) & 0x10));
+
+    cpu->bus->bus_write8(cpu->bus->component, address, res);
+}
 

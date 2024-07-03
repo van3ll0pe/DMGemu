@@ -118,7 +118,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x02: break;
         case 0x03: break;
         case 0x04: break;
-        case 0x05: break;
+        case 0x05:  //DEC B
+                    cpu_instr_DEC8(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0x06: break;
         case 0x07: break;
         case 0x08: break;
@@ -129,7 +132,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x0A: break;
         case 0x0B: break;
         case 0x0C: break;
-        case 0x0D: break;
+        case 0x0D:  //DEC C
+                    cpu_instr_DEC8(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
         case 0x0E: break;
         case 0x0F: break;
         
@@ -138,7 +144,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x12: break;
         case 0x13: break;
         case 0x14: break;
-        case 0x15: break;
+        case 0x15:  //DEC D
+                    cpu_instr_DEC8(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0x16: break;
         case 0x17: break;
         case 0x18: break;
@@ -149,7 +158,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x1A: break;
         case 0x1B: break;
         case 0x1C: break;
-        case 0x1D: break;
+        case 0x1D:  //DEC E
+                    cpu_instr_DEC8(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
         case 0x1E: break;
         case 0x1F: break;
 
@@ -158,7 +170,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x22: break;
         case 0x23: break;
         case 0x24: break;
-        case 0x25: break;
+        case 0x25:  //DEC H
+                    cpu_instr_DEC8(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0x26: break;
         case 0x27: break;
         case 0x28: break;
@@ -169,7 +184,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x2A: break;
         case 0x2B: break;
         case 0x2C: break;
-        case 0x2D: break;
+        case 0x2D:  //DEC L
+                    cpu_instr_DEC8(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
         case 0x2E: break;
         case 0x2F: break;
 
@@ -178,7 +196,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x32: break;
         case 0x33: break;
         case 0x34: break;
-        case 0x35: break;
+        case 0x35:  //DEC [HL]
+                    cpu_instr_DECHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 12;
+                    break;
         case 0x36: break;
         case 0x37: break;
         case 0x38: break;
@@ -189,7 +210,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x3A: break;
         case 0x3B: break;
         case 0x3C: break;
-        case 0x3D: break;
+        case 0x3D:  //DEC A
+                    cpu_instr_DEC8(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0x3E: break;
         case 0x3F: break;
 
@@ -392,14 +416,38 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xB5: break;
         case 0xB6: break;
         case 0xB7: break;
-        case 0xB8: break;
-        case 0xB9: break;
-        case 0xBA: break;
-        case 0xBB: break;
-        case 0xBC: break;
-        case 0xBD: break;
-        case 0xBE: break;
-        case 0xBF: break;
+        case 0xB8:  //CP A, B
+                    cpu_instr_CP(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB9:  //CP A, C
+                    cpu_instr_CP(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xBA:  //CP A, D
+                    cpu_instr_CP(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xBB:  //CP A, E
+                    cpu_instr_CP(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xBC:  //CP A, H
+                    cpu_instr_CP(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xBD:  //CP A, L
+                    cpu_instr_CP(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xBE:  //CP A, [HL]
+                    cpu_instr_CP(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0xBF:  //CP A, A
+                    cpu_instr_CP(cpu, cpu->AF.r8.hi); //perform 1100 for flag
+                    cpu->cycle = 4;
+                    break;
 
         case 0xC0: break;
         case 0xC1: break;
@@ -467,7 +515,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xF9: break;
         case 0xFA: break;
         case 0xFB: break;
-        case 0xFE: break;
+        case 0xFE:  //CP A, n8
+                    cpu_instr_CP(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xFF: break;
 
         default:    fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION");
