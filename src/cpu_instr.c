@@ -117,3 +117,12 @@ void cpu_instr_DECHL(Cpu* cpu, uint16_t address)
     cpu->bus->bus_write8(cpu->bus->component, address, res);
 }
 
+void cpu_instr_DEC16(Cpu* cpu, uint16_t* value)
+{
+    if (!cpu)
+        exit(1);
+
+    (*value)--;
+
+    //flags not affected
+}
