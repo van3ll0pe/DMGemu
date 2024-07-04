@@ -116,7 +116,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x00: break;
         case 0x01: break;
         case 0x02: break;
-        case 0x03: break;
+        case 0x03:  //INC BC
+                    cpu_instr_INC16(cpu, &cpu->BC.r16);
+                    cpu->cycle = 8;
+                    break;
         case 0x04:  //INC B
                     cpu_instr_INC8(cpu, &cpu->BC.r8.hi);
                     cpu->cycle = 4;
@@ -151,7 +154,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x10: break;
         case 0x11: break;
         case 0x12: break;
-        case 0x13: break;
+        case 0x13:  //INC DE
+                    cpu_instr_INC16(cpu, &cpu->DE.r16);
+                    cpu->cycle = 8;
+                    break;
         case 0x14:  //INC D
                     cpu_instr_INC8(cpu, &cpu->DE.r8.hi);
                     cpu->cycle = 4;
@@ -186,7 +192,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x20: break;
         case 0x21: break;
         case 0x22: break;
-        case 0x23: break;
+        case 0x23:  //INC HL
+                    cpu_instr_INC16(cpu, &cpu->HL.r16);
+                    cpu->cycle = 8;
+                    break;
         case 0x24:  //INC H
                     cpu_instr_INC8(cpu, &cpu->HL.r8.hi);
                     cpu->cycle = 4;
@@ -221,7 +230,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x30: break;
         case 0x31: break;
         case 0x32: break;
-        case 0x33: break;
+        case 0x33:  //INC SP
+                    cpu_instr_INC16(cpu, &cpu->SP);
+                    cpu->cycle = 8;
+                    break;
         case 0x34:  //INC [HL]
                     cpu_instr_INCHL(cpu, cpu->HL.r16);
                     cpu->cycle = 12;
