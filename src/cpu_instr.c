@@ -126,3 +126,31 @@ void cpu_instr_DEC16(Cpu* cpu, uint16_t* value)
 
     //flags not affected
 }
+
+void cpu_instr_INC8(Cpu* cpu, uint8_t* value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t res = (*value) + 1;
+
+    cpu_checkFlag(cpu, Z_FLAG, (res == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, ((((*value) & 0xF) + 1) & 0x10));
+
+    *value = res;
+}
+
+void cpu_instr_INCHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+
+    uint8_t res = cpu->bus->bus_read8(cpu->bus->component, address) + 1;
+
+    cpu_checkFlag(cpu, Z_FLAG, (res == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, ((((cpu->bus->bus_read8(cpu->bus->component, address)) & 0xF) + 1) & 0x10));
+
+    cpu->bus->bus_write8(cpu->bus->component, address, res);
+}
