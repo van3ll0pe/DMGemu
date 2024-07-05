@@ -6,13 +6,14 @@ void cpu_instr_ADC(Cpu* cpu, uint8_t value)
 {
     if (!cpu)
         exit(1);
-    
-   uint32_t res = cpu->AF.r8.hi + value + cpu_getFlag(cpu, C_FLAG);
-   uint8_t resFinal = (uint8_t)res;
+
+    uint8_t flag = cpu_getFlag(cpu, C_FLAG);
+    uint32_t res = cpu->AF.r8.hi + value + flag;
+    uint8_t resFinal = (uint8_t)res;
 
     cpu_checkFlag(cpu, Z_FLAG, (resFinal == 0));
     cpu_clearFlag(cpu, N_FLAG);
-    cpu_checkFlag(cpu, H_FLAG, (((cpu->AF.r8.hi & 0xF) + (value & 0xF) + cpu_getFlag(cpu, C_FLAG)) & 0x10));
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->AF.r8.hi & 0xF) + (value & 0xF) + flag) & 0x10));
     cpu_checkFlag(cpu, C_FLAG, (res & 0x100));
 
     cpu->AF.r8.hi = resFinal;
@@ -163,4 +164,33 @@ void cpu_instr_INC16(Cpu* cpu, uint16_t *value)
     (*value)++;
 
     //flags not affected
+}
+
+void cpu_instr_OR(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->AF.r8.hi |= value;
+
+    cpu_checkFlag(cpu, Z_FLAG, (cpu->AF.r8.hi == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_clearFlag(cpu, C_FLAG);
+}
+
+void cpu_instr_SBC(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    uint8_t flag = cpu_getFlag(cpu, C_FLAG);
+    uint32_t res = cpu->AF.r8.hi - value - flag;
+    uint8_t resFinal = (uint8_t)res;
+
+    cpu_checkFlag(cpu, Z_FLAG, (resFinal == 0));
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->AF.r8.hi & 0xf) - (value & 0xf) - flag) & 0x10));
+    cpu_checkFlag(cpu, C_FLAG, (res & 0x100));
+
+    cpu->AF.r8.hi = resFinal;
 }

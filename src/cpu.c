@@ -406,14 +406,38 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0x95: break;
         case 0x96: break;
         case 0x97: break;
-        case 0x98: break;
-        case 0x99: break;
-        case 0x9A: break;
-        case 0x9B: break;
-        case 0x9C: break;
-        case 0x9D: break;
-        case 0x9E: break;
-        case 0x9F: break;
+        case 0x98:  //SBC A, B
+                    cpu_instr_SBC(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x99:  //SBC A, C
+                    cpu_instr_SBC(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x9A:  //SBC A, D
+                    cpu_instr_SBC(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x9B:  //SBC A, E
+                    cpu_instr_SBC(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x9C:  //SBC A, H
+                    cpu_instr_SBC(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x9D:  //SBC A, L
+                    cpu_instr_SBC(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x9E:  //SBC A, [HL]
+                    cpu_instr_SBC(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x9F:  //SBC A, A
+                    cpu_instr_SBC(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
 
         case 0xA0:  //AND A, B
                     cpu_instr_AND(cpu, cpu->BC.r8.hi);
@@ -456,14 +480,38 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xAE: break;
         case 0xAF: break;
 
-        case 0xB0: break;
-        case 0xB1: break;
-        case 0xB2: break;
-        case 0xB3: break;
-        case 0xB4: break;
-        case 0xB5: break;
-        case 0xB6: break;
-        case 0xB7: break;
+        case 0xB0:  //OR A, B
+                    cpu_instr_OR(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB1:  //OR A, C
+                    cpu_instr_OR(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB2:  //OR A, D
+                    cpu_instr_OR(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB3:  //OR A, E
+                    cpu_instr_OR(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB4:  //OR A, H
+                    cpu_instr_OR(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB5:  //OR A, L
+                    cpu_instr_OR(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xB6:  //OR A, [HL]
+                    cpu_instr_OR(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0xB7:  //OR A, A
+                    cpu_instr_OR(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0xB8:  //CP A, B
                     cpu_instr_CP(cpu, cpu->BC.r8.hi);
                     cpu->cycle = 4;
@@ -531,7 +579,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xD9: break;
         case 0xDA: break;
         case 0xDC: break;
-        case 0xDE: break;
+        case 0xDE:  //SBC A, n8
+                    cpu_instr_SBC(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xDF: break;
 
         case 0xE0: break;
@@ -557,7 +608,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xF2: break;
         case 0xF3: break;
         case 0xF5: break;
-        case 0xF6: break;
+        case 0xF6:  //OR A, n8
+                    cpu_instr_OR(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xF7: break;
         case 0xF8: break;
         case 0xF9: break;
