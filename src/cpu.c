@@ -398,14 +398,38 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 4;
                     break;
 
-        case 0x90: break;
-        case 0x91: break;
-        case 0x92: break;
-        case 0x93: break;
-        case 0x94: break;
-        case 0x95: break;
-        case 0x96: break;
-        case 0x97: break;
+        case 0x90:  //SUB A, B
+                    cpu_instr_SUB(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x91:  //SUB A, C
+                    cpu_instr_SUB(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x92:  //SUB A, D
+                    cpu_instr_SUB(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x93:  //SUB A, E
+                    cpu_instr_SUB(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x94:  //SUB A, H
+                    cpu_instr_SUB(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x95:  //SUB A, L
+                    cpu_instr_SUB(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x96:  //SUB A, [HL]
+                    cpu_instr_SUB(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x97:  //SUB A, A
+                    cpu_instr_SUB(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
         case 0x98:  //SBC A, B
                     cpu_instr_SBC(cpu, cpu->BC.r8.hi);
                     cpu->cycle = 4;
@@ -471,14 +495,38 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_AND(cpu, cpu->AF.r8.hi);
                     cpu->cycle = 4;
                     break;
-        case 0xA8: break;
-        case 0xA9: break;
-        case 0xAA: break;
-        case 0xAB: break;
-        case 0xAC: break;
-        case 0xAD: break;
-        case 0xAE: break;
-        case 0xAF: break;
+        case 0xA8:  //XOR A, B
+                    cpu_instr_XOR(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xA9:  //XOR A, C
+                    cpu_instr_XOR(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xAA:  //XOR A, D
+                    cpu_instr_XOR(cpu,  cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xAB:  //XOR A, E
+                    cpu_instr_XOR(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xAC:  //XOR A, H
+                    cpu_instr_XOR(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0xAD:  //XOR A, L
+                    cpu_instr_XOR(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0xAE:  //XOR A, [HL]
+                    cpu_instr_XOR(cpu, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0xAF:  //XOR A, A
+                    cpu_instr_XOR(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
 
         case 0xB0:  //OR A, B
                     cpu_instr_OR(cpu, cpu->BC.r8.hi);
@@ -573,7 +621,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xD2: break;
         case 0xD4: break;
         case 0xD5: break;
-        case 0xD6: break;
+        case 0xD6:  //SUB A, n8
+                    cpu_instr_SUB(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xD7: break;
         case 0xD8: break;
         case 0xD9: break;
@@ -600,7 +651,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
         case 0xE9: break;
         case 0xEA: break;
-        case 0xEE: break;
+        case 0xEE:  //XOR A, n8
+                    cpu_instr_XOR(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0xEF: break;
 
         case 0xF0: break;

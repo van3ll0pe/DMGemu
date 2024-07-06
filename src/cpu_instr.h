@@ -18,4 +18,7 @@ void cpu_instr_INCHL(Cpu* cpu, uint16_t address);
 void cpu_instr_INC16(Cpu* cpu, uint16_t *value);
 void cpu_instr_OR(Cpu* cpu, uint8_t value);
 void cpu_instr_SBC(Cpu* cpu, uint8_t value);
+void cpu_instr_SUB(Cpu* cpu, uint8_t value);
+void cpu_instr_XOR(Cpu* cpu, uint8_t value);
+
 #endif //__CPU_INSTR_H__

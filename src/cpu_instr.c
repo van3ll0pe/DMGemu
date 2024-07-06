@@ -194,3 +194,32 @@ void cpu_instr_SBC(Cpu* cpu, uint8_t value)
 
     cpu->AF.r8.hi = resFinal;
 }
+
+void cpu_instr_SUB(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint32_t res = cpu->AF.r8.hi - value;
+    uint8_t resFinal = (uint8_t)res;
+
+    cpu_checkFlag(cpu, Z_FLAG, (resFinal == 0));
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->AF.r8.hi & 0xf) - (value & 0xf)) & 0x10));
+    cpu_checkFlag(cpu, C_FLAG, (res & 0x100));
+
+    cpu->AF.r8.hi = resFinal;
+}
+
+void cpu_instr_XOR(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->AF.r8.hi ^= value;
+
+    cpu_checkFlag(cpu, Z_FLAG, (cpu->AF.r8.hi == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_clearFlag(cpu, C_FLAG);
+}
