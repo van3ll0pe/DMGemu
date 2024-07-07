@@ -113,7 +113,9 @@ void cpu_execute_instruction(Cpu* cpu)
         exit(1);
     
     switch (cpu->opcode) {
-        case 0x00: break;
+        case 0x00:  //NOP
+                    cpu->cycle = 4;
+                    break;
         case 0x01: break;
         case 0x02: break;
         case 0x03:  //INC BC
@@ -128,7 +130,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->BC.r8.hi);
                     cpu->cycle = 4;
                     break;
-        case 0x06: break;
+        case 0x06:  //LD B, n8
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x07: break;
         case 0x08: break;
         case 0x09:  //ADD HL, BC
@@ -148,7 +153,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->BC.r8.lo);
                     cpu->cycle = 4;
                     break;
-        case 0x0E: break;
+        case 0x0E:  //LD C, n8
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x0F: break;
         
         case 0x10: break;
@@ -166,7 +174,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->DE.r8.hi);
                     cpu->cycle = 4;
                     break;
-        case 0x16: break;
+        case 0x16:  //LD D, n8
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x17: break;
         case 0x18: break;
         case 0x19:  //ADD HL, DE
@@ -186,7 +197,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->DE.r8.lo);
                     cpu->cycle = 4;
                     break;
-        case 0x1E: break;
+        case 0x1E:  //LD E, n8
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x1F: break;
 
         case 0x20: break;
@@ -204,7 +218,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->HL.r8.hi);
                     cpu->cycle = 4;
                     break;
-        case 0x26: break;
+        case 0x26:  //LD H, n8
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x27: break;
         case 0x28: break;
         case 0x29:  //ADD HL, HL
@@ -224,7 +241,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->HL.r8.lo);
                     cpu->cycle = 4;
                     break;
-        case 0x2E: break;
+        case 0x2E:  //LD L, n8
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x2F: break;
 
         case 0x30: break;
@@ -242,7 +262,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DECHL(cpu, cpu->HL.r16);
                     cpu->cycle = 12;
                     break;
-        case 0x36: break;
+        case 0x36:  //LD [HL], n8
+                    cpu_instr_LDHL_8(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 12;
+                    break;
         case 0x37: break;
         case 0x38: break;
         case 0x39:  //ADD HL, SP
@@ -262,76 +285,268 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_DEC8(cpu, &cpu->AF.r8.hi);
                     cpu->cycle = 4;
                     break;
-        case 0x3E: break;
+        case 0x3E:  //LD A, n8
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu_getPCImm8(cpu));
+                    cpu->cycle = 8;
+                    break;
         case 0x3F: break;
 
-        case 0x40: break;
-        case 0x41: break;
-        case 0x42: break;
-        case 0x43: break;
-        case 0x44: break;
-        case 0x45: break;
-        case 0x46: break;
-        case 0x47: break;
-        case 0x48: break;
-        case 0x49: break;
-        case 0x4A: break;
-        case 0x4B: break;
-        case 0x4C: break;
-        case 0x4D: break;
-        case 0x4E: break;
-        case 0x4F: break;
+        case 0x40:  //LD B, B
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x41:  //LD B, C
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x42:  //LD B, D
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x43:  //LD B, E
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x44:  //LD B, H
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x45:  //LD B, L
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x46:  //LD B, [HL]
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x47:  //LD B, A
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x48:  //LD C, B
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x49:  //LD C, C
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x4A:  //LD C, D
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x4B:  //LD C, E
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x4C:  //LD C, H
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x4D:  //LD C, L
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x4E:  //LD C, [HL]
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x4F:  //LD C, A
+                    cpu_instr_LDr8_8(&(cpu->BC.r8.lo), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
 
-        case 0x50: break;
-        case 0x51: break;
-        case 0x52: break;
-        case 0x53: break;
-        case 0x54: break;
-        case 0x55: break;
-        case 0x56: break;
-        case 0x57: break;
-        case 0x58: break;
-        case 0x59: break;
-        case 0x5A: break;
-        case 0x5B: break;
-        case 0x5C: break;
-        case 0x5D: break;
-        case 0x5E: break;
-        case 0x5F: break;
+        case 0x50:  //LD D, B
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x51:  //LD D, C
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x52:  //LD D, D
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x53:  //LD D, E
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x54:  //LD D, H
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x55:  //LD D, L
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x56:  //LD D, [HL]
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x57:  //LD D, A
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.hi), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x58:  //LD E, B
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x59:  //LD E, C
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x5A:  //LD E, D
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x5B:  //LD E, E
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x5C:  //LD E, H
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x5D:  //LD E, L
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x5E:  //LD E, [HL]
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x5F:  //LD E, A
+                    cpu_instr_LDr8_8(&(cpu->DE.r8.lo), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
 
-        case 0x60: break;
-        case 0x61: break;
-        case 0x62: break;
-        case 0x63: break;
-        case 0x64: break;
-        case 0x65: break;
-        case 0x66: break;
-        case 0x67: break;
-        case 0x68: break;
-        case 0x69: break;
-        case 0x6A: break;
-        case 0x6B: break;
-        case 0x6C: break;
-        case 0x6D: break;
-        case 0x6E: break;
-        case 0x6F: break;
+        case 0x60:  //LD H, B
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x61:  //LD H, C
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x62:  //LD H, D
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x63:  //LD H, E
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x64:  //LD H, H
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x65:  //LD H, L
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x66:  //LD H, [HL]
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x67:  //LD H, A
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x68:  ///LD L, B
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->BC.r8.hi);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x69:  //LD L, C
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->BC.r8.lo);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x6A:  //LD L, D
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->DE.r8.hi);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x6B:  //LD L, E
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->DE.r8.lo);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x6C:  //LD L, H
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->HL.r8.hi);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x6D:  //LD L, L
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->HL.r8.lo);
+                    cpu->cycle  = 4;
+                    break;
+        case 0x6E:  //LD L, [HL]
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle  = 8;
+                    break;
+        case 0x6F:  //LD L, A
+                    cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu->AF.r8.hi);
+                    cpu->cycle  = 4;
+                    break;
 
-        case 0x70: break;
-        case 0x71: break;
-        case 0x72: break;
-        case 0x73: break;
-        case 0x74: break;
-        case 0x75: break;
+        case 0x70:  //LD [HL], B
+                    cpu_instr_LDHL_8(cpu, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x71:  //LD [HL], C
+                    cpu_instr_LDHL_8(cpu, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x72:  //LD [HL], D
+                    cpu_instr_LDHL_8(cpu, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x73:  //LD [HL], E
+                    cpu_instr_LDHL_8(cpu, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x74:  //LD [HL], H
+                    cpu_instr_LDHL_8(cpu, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x75:  //LD [HL], L
+                    cpu_instr_LDHL_8(cpu, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
         case 0x76: break;
-        case 0x77: break;
-        case 0x78: break;
-        case 0x79: break;
-        case 0x7A: break;
-        case 0x7B: break;
-        case 0x7C: break;
-        case 0x7D: break;
-        case 0x7E: break;
-        case 0x7F: break;
+        case 0x77:  ///LD [HL], A
+                    cpu_instr_LDHL_8(cpu, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x78:  //LD A, B
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->BC.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x79:  //LD A, C
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->BC.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x7A:  //LD A, D
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->DE.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x7B:  //LD A, E
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->DE.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x7C:  //LD A, H
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->HL.r8.hi);
+                    cpu->cycle = 4;
+                    break;
+        case 0x7D:  //LD A, L
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->HL.r8.lo);
+                    cpu->cycle = 4;
+                    break;
+        case 0x7E:  //LD A, [HL]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 8;
+                    break;
+        case 0x7F:  //LD A, A
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->AF.r8.hi);
+                    cpu->cycle = 4;
+                    break;
 
         case 0x80:  //ADD A, B
                     cpu_instr_ADD8(cpu, cpu->BC.r8.hi);

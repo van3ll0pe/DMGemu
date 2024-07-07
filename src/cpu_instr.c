@@ -223,3 +223,23 @@ void cpu_instr_XOR(Cpu* cpu, uint8_t value)
     cpu_clearFlag(cpu, H_FLAG);
     cpu_clearFlag(cpu, C_FLAG);
 }
+
+
+
+/*************************************************************************************/
+
+void cpu_instr_LDr8_8(uint8_t* dst, uint8_t value)
+{
+    if (!dst)
+        exit(1);
+
+    *dst = value;
+}
+
+void cpu_instr_LDHL_8(Cpu* cpu, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->bus->bus_write8(cpu->bus->component, cpu->HL.r16, value);
+}

@@ -4,6 +4,7 @@
 #include "cpu.h"
 #include <stdint.h>
 
+//arithmetic operation 8bits / 16bits
 void cpu_instr_ADC(Cpu* cpu, uint8_t value);
 void cpu_instr_ADD8(Cpu* cpu, uint8_t value);
 void cpu_instr_ADD16(Cpu* cpu, uint16_t value);
@@ -20,5 +21,9 @@ void cpu_instr_OR(Cpu* cpu, uint8_t value);
 void cpu_instr_SBC(Cpu* cpu, uint8_t value);
 void cpu_instr_SUB(Cpu* cpu, uint8_t value);
 void cpu_instr_XOR(Cpu* cpu, uint8_t value);
+
+//load operation
+void cpu_instr_LDr8_8(uint8_t* dst, uint8_t value);
+void cpu_instr_LDHL_8(Cpu* cpu, uint8_t value);
 
 #endif //__CPU_INSTR_H__
