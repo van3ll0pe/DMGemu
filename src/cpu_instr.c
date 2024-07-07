@@ -236,10 +236,10 @@ void cpu_instr_LDr8_8(uint8_t* dst, uint8_t value)
     *dst = value;
 }
 
-void cpu_instr_LDHL_8(Cpu* cpu, uint8_t value)
+void cpu_instr_LDmem16_8(Cpu* cpu,uint16_t address, uint8_t value)
 {
     if (!cpu)
         exit(1);
     
-    cpu->bus->bus_write8(cpu->bus->component, cpu->HL.r16, value);
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
 }

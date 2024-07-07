@@ -117,7 +117,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 4;
                     break;
         case 0x01: break;
-        case 0x02: break;
+        case 0x02:  //LD [BC], A
+                    cpu_instr_LDmem16_8(cpu, cpu->BC.r16, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
         case 0x03:  //INC BC
                     cpu_instr_INC16(cpu, &cpu->BC.r16);
                     cpu->cycle = 8;
@@ -140,7 +143,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADD16(cpu, cpu->BC.r16);
                     cpu->cycle = 8;
                     break;
-        case 0x0A: break;
+        case 0x0A:  //LD A, [BC]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->BC.r16));
+                    cpu->cycle = 8;
+                    break;
         case 0x0B:  //DEC BC
                     cpu_instr_DEC16(cpu, &cpu->BC.r16);
                     cpu->cycle = 8;
@@ -161,7 +167,10 @@ void cpu_execute_instruction(Cpu* cpu)
         
         case 0x10: break;
         case 0x11: break;
-        case 0x12: break;
+        case 0x12:  //LD [DE], A
+                    cpu_instr_LDmem16_8(cpu, cpu->DE.r16, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
         case 0x13:  //INC DE
                     cpu_instr_INC16(cpu, &cpu->DE.r16);
                     cpu->cycle = 8;
@@ -184,7 +193,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADD16(cpu, cpu->DE.r16);
                     cpu->cycle = 8;
                     break;
-        case 0x1A: break;
+        case 0x1A:  //LD A, [DE]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->DE.r16));
+                    cpu->cycle = 8;
+                    break;
         case 0x1B:  //DEC DE
                     cpu_instr_DEC16(cpu, &cpu->DE.r16);
                     cpu->cycle = 8;
@@ -205,7 +217,11 @@ void cpu_execute_instruction(Cpu* cpu)
 
         case 0x20: break;
         case 0x21: break;
-        case 0x22: break;
+        case 0x22:  //LD [HL+], A
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16,cpu->AF.r8.hi);
+                    cpu->HL.r16++;
+                    cpu->cycle = 8;
+                    break;
         case 0x23:  //INC HL
                     cpu_instr_INC16(cpu, &cpu->HL.r16);
                     cpu->cycle = 8;
@@ -228,7 +244,11 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADD16(cpu, cpu->HL.r16);
                     cpu->cycle = 8;
                     break;
-        case 0x2A: break;
+        case 0x2A:  //LD A, [HL+]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->HL.r16++;
+                    cpu->cycle = 8;
+                    break;
         case 0x2B:  //DEC HL
                     cpu_instr_DEC16(cpu, &cpu->HL.r16);
                     cpu->cycle = 8;
@@ -249,7 +269,11 @@ void cpu_execute_instruction(Cpu* cpu)
 
         case 0x30: break;
         case 0x31: break;
-        case 0x32: break;
+        case 0x32:  //LD [HL-], A
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->AF.r8.hi);
+                    cpu->HL.r16--;
+                    cpu->cycle = 8;
+                    break;
         case 0x33:  //INC SP
                     cpu_instr_INC16(cpu, &cpu->SP);
                     cpu->cycle = 8;
@@ -263,7 +287,7 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 12;
                     break;
         case 0x36:  //LD [HL], n8
-                    cpu_instr_LDHL_8(cpu, cpu_getPCImm8(cpu));
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu_getPCImm8(cpu));
                     cpu->cycle = 12;
                     break;
         case 0x37: break;
@@ -272,7 +296,11 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADD16(cpu, cpu->SP);
                     cpu->cycle = 8;
                     break;
-        case 0x3A: break;
+        case 0x3A:  //LD A, [HL-]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->HL.r16--;
+                    cpu->cycle = 8;
+                    break;
         case 0x3B:  //DEC SP
                     cpu_instr_DEC16(cpu, &cpu->SP);
                     cpu->cycle = 8;
@@ -487,32 +515,32 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
 
         case 0x70:  //LD [HL], B
-                    cpu_instr_LDHL_8(cpu, cpu->BC.r8.hi);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->BC.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x71:  //LD [HL], C
-                    cpu_instr_LDHL_8(cpu, cpu->BC.r8.lo);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->BC.r8.lo);
                     cpu->cycle = 8;
                     break;
         case 0x72:  //LD [HL], D
-                    cpu_instr_LDHL_8(cpu, cpu->DE.r8.hi);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->DE.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x73:  //LD [HL], E
-                    cpu_instr_LDHL_8(cpu, cpu->DE.r8.lo);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->DE.r8.lo);
                     cpu->cycle = 8;
                     break;
         case 0x74:  //LD [HL], H
-                    cpu_instr_LDHL_8(cpu, cpu->HL.r8.hi);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->HL.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x75:  //LD [HL], L
-                    cpu_instr_LDHL_8(cpu, cpu->HL.r8.lo);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->HL.r8.lo);
                     cpu->cycle = 8;
                     break;
         case 0x76: break;
         case 0x77:  ///LD [HL], A
-                    cpu_instr_LDHL_8(cpu, cpu->AF.r8.hi);
+                    cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->AF.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x78:  //LD A, B
@@ -851,9 +879,15 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
         case 0xDF: break;
 
-        case 0xE0: break;
+        case 0xE0:  //LDH [a8], A
+                    cpu_instr_LDmem16_8(cpu, (uint16_t)(0xff00 + cpu_getPCImm8(cpu)), cpu->AF.r8.hi);
+                    cpu->cycle = 12;
+                    break;
         case 0xE1: break;
-        case 0xE2: break;
+        case 0xE2:  //LD [C], A
+                    cpu_instr_LDmem16_8(cpu, (uint16_t)(0xff00 + cpu->BC.r8.lo), cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
         case 0xE5: break;
         case 0xE6:  //AND A, n8
                     cpu_instr_AND(cpu, cpu_getPCImm8(cpu));
@@ -865,16 +899,25 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 16;
                     break;
         case 0xE9: break;
-        case 0xEA: break;
+        case 0xEA:  //LD [a16], A
+                    cpu_instr_LDmem16_8(cpu, cpu_getPCImm16(cpu), cpu->AF.r8.hi);
+                    cpu->cycle = 16;
+                    break;
         case 0xEE:  //XOR A, n8
                     cpu_instr_XOR(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
         case 0xEF: break;
 
-        case 0xF0: break;
+        case 0xF0:  //LDH A, [a8]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu_getPCImm8(cpu))));
+                    cpu->cycle = 12;
+                    break;
         case 0xF1: break;
-        case 0xF2: break;
+        case 0xF2:  //LD A, [C]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu->BC.r8.lo)));
+                    cpu->cycle = 8;
+                    break;
         case 0xF3: break;
         case 0xF5: break;
         case 0xF6:  //OR A, n8
@@ -884,7 +927,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xF7: break;
         case 0xF8: break;
         case 0xF9: break;
-        case 0xFA: break;
+        case 0xFA:  //LD A, [a16]
+                    cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu_getPCImm16(cpu)));
+                    cpu->cycle = 16;
+                    break;
         case 0xFB: break;
         case 0xFE:  //CP A, n8
                     cpu_instr_CP(cpu, cpu_getPCImm8(cpu));
