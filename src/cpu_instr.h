@@ -22,8 +22,12 @@ void cpu_instr_SBC(Cpu* cpu, uint8_t value);
 void cpu_instr_SUB(Cpu* cpu, uint8_t value);
 void cpu_instr_XOR(Cpu* cpu, uint8_t value);
 
-//load operation
+//load operation 8bits
 void cpu_instr_LDr8_8(uint8_t* dst, uint8_t value);
 void cpu_instr_LDmem16_8(Cpu* cpu, uint16_t address, uint8_t value);
+
+//POP PUSH
+void cpu_instr_PUSH(Cpu* cpu, uint16_t r16);
+void cpu_instr_POP(Cpu* cpu, uint16_t* r16);
 
 #endif //__CPU_INSTR_H__

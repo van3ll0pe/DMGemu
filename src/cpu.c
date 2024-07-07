@@ -837,11 +837,17 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
 
         case 0xC0: break;
-        case 0xC1: break;
+        case 0xC1:  //POP BC
+                    cpu_instr_POP(cpu, &(cpu->BC.r16));
+                    cpu->cycle = 12;
+                    break;
         case 0xC2: break;
         case 0xC3: break;
         case 0xC4: break;
-        case 0xC5: break;
+        case 0xC5:  //PUSH BC
+                    cpu_instr_PUSH(cpu, cpu->BC.r16);
+                    cpu->cycle = 16;
+                    break;
         case 0xC6:  //ADD A, n8
                     cpu_instr_ADD8(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
@@ -860,10 +866,16 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xCF: break;
 
         case 0xD0: break;
-        case 0xD1: break;
+        case 0xD1:  //POP DE
+                    cpu_instr_POP(cpu, &(cpu->DE.r16));
+                    cpu->cycle = 12;
+                    break;
         case 0xD2: break;
         case 0xD4: break;
-        case 0xD5: break;
+        case 0xD5:  //PUSH DE
+                    cpu_instr_PUSH(cpu, cpu->DE.r16);
+                    cpu->cycle = 16;
+                    break;
         case 0xD6:  //SUB A, n8
                     cpu_instr_SUB(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
@@ -883,12 +895,18 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDmem16_8(cpu, (uint16_t)(0xff00 + cpu_getPCImm8(cpu)), cpu->AF.r8.hi);
                     cpu->cycle = 12;
                     break;
-        case 0xE1: break;
+        case 0xE1:  //POP HL
+                    cpu_instr_POP(cpu, &(cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
         case 0xE2:  //LD [C], A
                     cpu_instr_LDmem16_8(cpu, (uint16_t)(0xff00 + cpu->BC.r8.lo), cpu->AF.r8.hi);
                     cpu->cycle = 8;
                     break;
-        case 0xE5: break;
+        case 0xE5:  //PUSH HL
+                    cpu_instr_PUSH(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
         case 0xE6:  //AND A, n8
                     cpu_instr_AND(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
@@ -913,13 +931,19 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu_getPCImm8(cpu))));
                     cpu->cycle = 12;
                     break;
-        case 0xF1: break;
+        case 0xF1:  //POP AF
+                    cpu_instr_POP(cpu, &(cpu->AF.r16));
+                    cpu->cycle = 12;
+                    break;
         case 0xF2:  //LD A, [C]
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu->BC.r8.lo)));
                     cpu->cycle = 8;
                     break;
         case 0xF3: break;
-        case 0xF5: break;
+        case 0xF5:  //PUSH AF
+                    cpu_instr_PUSH(cpu, cpu->AF.r16);
+                    cpu->cycle = 16;
+                    break;
         case 0xF6:  //OR A, n8
                     cpu_instr_OR(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
