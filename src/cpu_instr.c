@@ -244,6 +244,25 @@ void cpu_instr_LDmem16_8(Cpu* cpu,uint16_t address, uint8_t value)
     cpu->bus->bus_write8(cpu->bus->component, address, value);
 }
 
+/***********************************************************************************/
+
+void cpu_instr_LDr16_16(uint16_t* dst, uint16_t value)
+{
+    if (!dst)
+        exit(1);
+    
+    *dst = value;
+}
+
+void cpu_instr_LDmem16_16(Cpu* cpu, uint16_t address, uint16_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->bus->bus_write16(cpu->bus->component, address, value);
+}
+
+
 /************************************************************************************/
 
 void cpu_instr_PUSH(Cpu* cpu, uint16_t r16)
