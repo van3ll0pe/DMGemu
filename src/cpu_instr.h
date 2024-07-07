@@ -29,9 +29,15 @@ void cpu_instr_LDmem16_8(Cpu* cpu, uint16_t address, uint8_t value);
 //load operation 16bits
 void cpu_instr_LDr16_16(uint16_t* dst, uint16_t value);
 void cpu_instr_LDmem16_16(Cpu* cpu, uint16_t address, uint16_t value);
+void cpu_instr_LDHLSPe8(Cpu* cpu, int8_t value);
 
 //POP PUSH
 void cpu_instr_PUSH(Cpu* cpu, uint16_t r16);
 void cpu_instr_POP(Cpu* cpu, uint16_t* r16);
+
+//FLAG instruction & others
+void cpu_instr_CCF(Cpu* cpu);
+void cpu_instr_SCF(Cpu* cpu);
+void cpu_instr_CPL(Cpu* cpu);
 
 #endif //__CPU_INSTR_H__

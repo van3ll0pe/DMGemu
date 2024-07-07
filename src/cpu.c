@@ -24,6 +24,8 @@ void cpu_init(Cpu* cpu)
 
     cpu->cycle = 0;
     cpu->opcode = 0;
+
+    cpu->IME = false;
 }
 
 void cpu_link_bus(Cpu* cpu, Bus* bus)
@@ -277,7 +279,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->HL.r8.lo), cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0x2F: break;
+        case 0x2F:  //CPL
+                    cpu_instr_CPL(cpu);
+                    cpu->cycle = 4;
+                    break;
 
         case 0x30: break;
         case 0x31:  //LD SP, n16
@@ -305,7 +310,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu_getPCImm8(cpu));
                     cpu->cycle = 12;
                     break;
-        case 0x37: break;
+        case 0x37:  //SCF
+                    cpu_instr_SCF(cpu);
+                    cpu->cycle = 4;
+                    break;
         case 0x38: break;
         case 0x39:  //ADD HL, SP
                     cpu_instr_ADD16(cpu, cpu->SP);
@@ -332,7 +340,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0x3F: break;
+        case 0x3F:  //CCF
+                    cpu_instr_CCF(cpu);
+                    cpu->cycle = 4;
+                    break;
 
         case 0x40:  //LD B, B
                     cpu_instr_LDr8_8(&(cpu->BC.r8.hi), cpu->BC.r8.hi);
@@ -949,6 +960,7 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xF1:  //POP AF
                     cpu_instr_POP(cpu, &(cpu->AF.r16));
                     cpu->cycle = 12;
+                    //no need to manage flags because when pop, F is set with the new bit for flags.
                     break;
         case 0xF2:  //LD A, [C]
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu->BC.r8.lo)));
@@ -964,7 +976,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0xF7: break;
-        case 0xF8: break;
+        case 0xF8:  //LD HL, SP+e8
+                    cpu_instr_LDHLSPe8(cpu, cpu_getPCImm8(cpu));
+                    cpu->cycle = 12;
+                    break;
         case 0xF9:  ///LD SP, HL
                     cpu_instr_LDr16_16(&(cpu->SP), cpu->HL.r16);
                     cpu->cycle = 8;

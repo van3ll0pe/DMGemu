@@ -90,6 +90,8 @@ typedef struct {
     uint8_t opcode;
     uint8_t cycle;
 
+    bool IME;
+
     Bus* bus;
 
 } Cpu;

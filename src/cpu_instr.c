@@ -262,6 +262,21 @@ void cpu_instr_LDmem16_16(Cpu* cpu, uint16_t address, uint16_t value)
     cpu->bus->bus_write16(cpu->bus->component, address, value);
 }
 
+void cpu_instr_LDHLSPe8(Cpu* cpu, int8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint32_t res = cpu->SP + value;
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_checkFlag(cpu, H_FLAG, (((cpu->SP & 0xf) + (value & 0xf)) & 0x10));
+    cpu_checkFlag(cpu, C_FLAG, (res & 0x100));
+
+    cpu->HL.r16 = (uint16_t)res;
+}
+
 
 /************************************************************************************/
 
@@ -281,4 +296,39 @@ void cpu_instr_POP(Cpu* cpu, uint16_t* r16)
     
     cpu->SP-= 2;
     *r16 = cpu->bus->bus_read16(cpu->bus->component, cpu->SP);
+}
+
+/**********************************************************************************/
+
+void cpu_instr_CCF(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t new_carry = cpu_getFlag(cpu, C_FLAG) ^ 1; //inverted value
+
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, new_carry); //set inverted carry value
+}
+
+void cpu_instr_SCF(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_setFlag(cpu, C_FLAG);
+}
+
+void cpu_instr_CPL(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->AF.r8.hi = ~(cpu->AF.r8.hi);
+
+    cpu_setFlag(cpu, N_FLAG);
+    cpu_setFlag(cpu, H_FLAG);
 }
