@@ -63,12 +63,13 @@
 #define SVBK 0xFF70
 #define IE 0xFFFF
 
-//FLAG CPU
 
-#define Z_FLAG 0x80
-#define N_FLAG 0x40
-#define H_FLAG 0x20
-#define C_FLAG 0x10
+typedef enum {
+    Z_FLAG = 0x80,
+    N_FLAG = 0x40,
+    H_FLAG = 0x20,
+    C_FLAG = 0x10
+} Flag;
 
 typedef union {
     uint16_t r16;
@@ -106,10 +107,10 @@ void cpu_execute_instruction(Cpu* cpu);
 uint8_t cpu_getPCImm8(Cpu* cpu);
 uint16_t cpu_getPCImm16(Cpu* cpu);
 
-void cpu_setFlag(Cpu* cpu, uint8_t flag);
-void cpu_clearFlag(Cpu* cpu, uint8_t flag);
-void cpu_checkFlag(Cpu* cpu, uint8_t flag, bool condition);
-uint8_t cpu_getFlag(Cpu* cpu, uint8_t flag);
+void cpu_setFlag(Cpu* cpu, Flag flag);
+void cpu_clearFlag(Cpu* cpu, Flag flag);
+void cpu_checkFlag(Cpu* cpu, Flag flag, bool condition);
+uint8_t cpu_getFlag(Cpu* cpu, Flag flag);
 
 
 

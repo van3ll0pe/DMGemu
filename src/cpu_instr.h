@@ -47,5 +47,6 @@ void cpu_instr_DI(Cpu* cpu);
 //JUMPS
 uint8_t cpu_instr_JP(Cpu* cpu, bool condition, uint16_t address); //returns the cycle machine
 uint8_t cpu_instr_CALL(Cpu* cpu, bool condition, uint16_t address); //returns the cycle machine
+uint8_t cpu_instr_RET(Cpu* cpu, bool condition);
 uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value); //returns the cycle machine
 #endif //__CPU_INSTR_H__

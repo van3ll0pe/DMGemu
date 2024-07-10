@@ -44,7 +44,7 @@ void cpu_link_bus(Cpu* cpu, Bus* bus)
     cpu->bus = bus;
 }
 
-void cpu_setFlag(Cpu* cpu, uint8_t flag)
+void cpu_setFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
         exit(1);
@@ -52,7 +52,7 @@ void cpu_setFlag(Cpu* cpu, uint8_t flag)
     cpu->AF.r8.lo |= flag;
 }
 
-void cpu_clearFlag(Cpu* cpu, uint8_t flag)
+void cpu_clearFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
         exit(1);
@@ -60,7 +60,7 @@ void cpu_clearFlag(Cpu* cpu, uint8_t flag)
     cpu->AF.r8.lo &= (~flag);
 }
 
-void cpu_checkFlag(Cpu* cpu, uint8_t flag, bool condition)
+void cpu_checkFlag(Cpu* cpu, Flag flag, bool condition)
 {
     if (!cpu)
         exit(1);
@@ -71,7 +71,7 @@ void cpu_checkFlag(Cpu* cpu, uint8_t flag, bool condition)
         cpu_clearFlag(cpu, flag);
 }
 
-uint8_t cpu_getFlag(Cpu* cpu, uint8_t flag)
+uint8_t cpu_getFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
         exit(1);
@@ -867,7 +867,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 4;
                     break;
 
-        case 0xC0: break;
+        case 0xC0:  //RET NZ
+                    cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, Z_FLAG) == 0));
+                    break;
         case 0xC1:  //POP BC
                     cpu_instr_POP(cpu, &(cpu->BC.r16));
                     cpu->cycle = 12;
@@ -879,7 +881,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = cpu_instr_JP(cpu, true, cpu_getPCImm16(cpu)); //condition is true to take the jump
                     break;
 
-        case 0xC4: break;
+        case 0xC4:  //CALL NZ, a16
+                    cpu->cycle = cpu_instr_CALL(cpu, (cpu_getFlag(cpu, Z_FLAG) == 0), cpu_getPCImm16(cpu));
+                    break;
         case 0xC5:  //PUSH BC
                     cpu_instr_PUSH(cpu, cpu->BC.r16);
                     cpu->cycle = 16;
@@ -889,21 +893,32 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0xC7: break;
-        case 0xC8: break;
-        case 0xC9: break;
+        case 0xC8:  //RET Z
+                    cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1));
+                    break;
+        case 0xC9:  //RET
+                    cpu_instr_RET(cpu, true);
+                    cpu->cycle = 16;
+                    break;
         case 0xCA:  //JP Z, a16
                     cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
                     break;
         case 0xCB: break;
-        case 0xCC: break;
-        case 0xCD: break;
+        case 0xCC:  //CALL Z, a16
+                    cpu->cycle = cpu_instr_CALL(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
+                    break;
+        case 0xCD:  //CALL a16
+                    cpu->cycle = cpu_instr_CALL(cpu, true, cpu_getPCImm16(cpu));
+                    break;
         case 0xCE:  //ADC A, n8
                     cpu_instr_ADC(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
         case 0xCF: break;
 
-        case 0xD0: break;
+        case 0xD0:  //RET NC
+                    cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, C_FLAG) == 0));
+                    break;
         case 0xD1:  //POP DE
                     cpu_instr_POP(cpu, &(cpu->DE.r16));
                     cpu->cycle = 12;
@@ -911,7 +926,9 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xD2:  //JP NC, a16
                     cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, C_FLAG) == 0), cpu_getPCImm16(cpu));
                     break;
-        case 0xD4: break;
+        case 0xD4:  //CALL NC, a16
+                    cpu->cycle = cpu_instr_CALL(cpu, (cpu_getFlag(cpu, C_FLAG) == 0), cpu_getPCImm16(cpu));
+                    break;
         case 0xD5:  //PUSH DE
                     cpu_instr_PUSH(cpu, cpu->DE.r16);
                     cpu->cycle = 16;
@@ -921,12 +938,20 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0xD7: break;
-        case 0xD8: break;
-        case 0xD9: break;
+        case 0xD8:  //RET C
+                    cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, C_FLAG) == 1));
+                    break;
+        case 0xD9:  //RETI
+                    cpu_instr_RET(cpu, (true));
+                    cpu->IME = true;
+                    cpu->cycle = 16;
+                    break;
         case 0xDA:  //JP C, a16
                     cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, C_FLAG) == 1), cpu_getPCImm16(cpu));
                     break;
-        case 0xDC: break;
+        case 0xDC:  //CALL C, a16
+                    cpu->cycle = cpu_instr_CALL(cpu, (cpu_getFlag(cpu, C_FLAG) == 1), cpu_getPCImm16(cpu));
+                    break;
         case 0xDE:  //SBC A, n8
                     cpu_instr_SBC(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;

@@ -285,8 +285,8 @@ void cpu_instr_PUSH(Cpu* cpu, uint16_t r16)
     if (!cpu)
         exit(1);
     
+    cpu->SP-=2;
     cpu->bus->bus_write16(cpu->bus->component, cpu->SP, r16);
-    cpu->SP+=2;
 }
 
 void cpu_instr_POP(Cpu* cpu, uint16_t* r16)
@@ -294,8 +294,8 @@ void cpu_instr_POP(Cpu* cpu, uint16_t* r16)
     if (!cpu || !r16)
         exit(1);
     
-    cpu->SP-= 2;
     *r16 = cpu->bus->bus_read16(cpu->bus->component, cpu->SP);
+    cpu->SP+=2;
 }
 
 /**********************************************************************************/
@@ -362,5 +362,42 @@ uint8_t cpu_instr_JP(Cpu* cpu, bool condition, uint16_t address)
     return 12;
 }
 
-uint8_t cpu_instr_CALL(Cpu* cpu, bool condition, uint16_t address);
-uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value);
+uint8_t cpu_instr_CALL(Cpu* cpu, bool condition, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (condition) {
+        cpu_instr_PUSH(cpu, cpu->PC);
+        cpu->PC = address;
+        return 24;
+    }
+    //no jump
+    return 12;
+}
+
+uint8_t cpu_instr_RET(Cpu* cpu, bool condition)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (condition) {
+        cpu_instr_POP(cpu, &cpu->PC);
+        return 20;
+    }
+    //no ret
+    return 8;
+}
+
+uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (condition) {
+        cpu->PC += value;
+        return 12;
+    }
+    //no relative jump
+    return 8;
+}
