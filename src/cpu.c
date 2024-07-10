@@ -204,7 +204,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0x17: break;
-        case 0x18: break;
+        case 0x18:  //JR e8
+                    cpu->cycle = cpu_instr_JR(cpu, true, (int8_t)cpu_getPCImm8(cpu));
+                    break;
         case 0x19:  //ADD HL, DE
                     cpu_instr_ADD16(cpu, cpu->DE.r16);
                     cpu->cycle = 8;
@@ -231,7 +233,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
         case 0x1F: break;
 
-        case 0x20: break;
+        case 0x20:  //JR NZ, e8
+                    cpu->cycle = cpu_instr_JR(cpu, (cpu_getFlag(cpu, Z_FLAG) == 0), (int8_t)cpu_getPCImm8(cpu));
+                    break;
         case 0x21:  //LD HL, n16
                     cpu_instr_LDr16_16(&(cpu->HL.r16), cpu_getPCImm16(cpu));
                     cpu->cycle = 12;
@@ -258,7 +262,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0x27: break;
-        case 0x28: break;
+        case 0x28:  //JR Z, e8
+                    cpu->cycle = cpu_instr_JR(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), (int8_t)cpu_getPCImm8(cpu));
+                    break;
         case 0x29:  //ADD HL, HL
                     cpu_instr_ADD16(cpu, cpu->HL.r16);
                     cpu->cycle = 8;
@@ -289,7 +295,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = 4;
                     break;
 
-        case 0x30: break;
+        case 0x30:  //JR NC, e8
+                    cpu->cycle = cpu_instr_JR(cpu, (cpu_getFlag(cpu, C_FLAG) == 0), (int8_t)cpu_getPCImm8(cpu));
+                    break;
         case 0x31:  //LD SP, n16
                     cpu_instr_LDr16_16(&(cpu->SP), cpu_getPCImm16(cpu));
                     cpu->cycle = 12;
@@ -319,7 +327,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_SCF(cpu);
                     cpu->cycle = 4;
                     break;
-        case 0x38: break;
+        case 0x38:  //JR C, e8
+                    cpu->cycle = cpu_instr_JR(cpu, (cpu_getFlag(cpu, C_FLAG) == 1), (int8_t)cpu_getPCImm8(cpu));
+                    break;
         case 0x39:  //ADD HL, SP
                     cpu_instr_ADD16(cpu, cpu->SP);
                     cpu->cycle = 8;
@@ -892,7 +902,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADD8(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xC7: break;
+        case 0xC7:  //RST 0x00
+                    cpu_instr_RST(cpu, 0x0000);
+                    cpu->cycle = 16;
+                    break;
         case 0xC8:  //RET Z
                     cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1));
                     break;
@@ -914,7 +927,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADC(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xCF: break;
+        case 0xCF:  //RST 0x08
+                    cpu_instr_RST(cpu, 0x0008);
+                    cpu->cycle =  16;
+                    break;
 
         case 0xD0:  //RET NC
                     cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, C_FLAG) == 0));
@@ -937,7 +953,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_SUB(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xD7: break;
+        case 0xD7:  //RST 0x10
+                    cpu_instr_RST(cpu, 0x0010);
+                    cpu->cycle = 16;
+                    break;
         case 0xD8:  //RET C
                     cpu->cycle = cpu_instr_RET(cpu, (cpu_getFlag(cpu, C_FLAG) == 1));
                     break;
@@ -956,7 +975,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_SBC(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xDF: break;
+        case 0xDF:  //RST 0x18
+                    cpu_instr_RST(cpu, 0x0018);
+                    cpu->cycle = 16;
+                    break;
 
         case 0xE0:  //LDH [a8], A
                     cpu_instr_LDmem16_8(cpu, (uint16_t)(0xff00 + cpu_getPCImm8(cpu)), cpu->AF.r8.hi);
@@ -978,7 +1000,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_AND(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xE7: break;
+        case 0xE7:  //RST 0x20
+                    cpu_instr_RST(cpu, 0x0020);
+                    cpu->cycle = 16;
+                    break;
         case 0xE8:  //ADD SP, e8
                     cpu_instr_ADDe8(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 16;
@@ -995,7 +1020,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_XOR(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xEF: break;
+        case 0xEF:  //RST 0x28
+                    cpu_instr_RST(cpu, 0x0028);
+                    cpu->cycle = 16;
+                    break;
 
         case 0xF0:  //LDH A, [a8]
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu_getPCImm8(cpu))));
@@ -1022,7 +1050,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_OR(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xF7: break;
+        case 0xF7:  //RST  0x30
+                    cpu_instr_RST(cpu, 0x0030);
+                    cpu->cycle = 16;
+                    break;
         case 0xF8:  //LD HL, SP+e8
                     cpu_instr_LDHLSPe8(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 12;
@@ -1043,7 +1074,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_CP(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0xFF: break;
+        case 0xFF:  //RST 0x38
+                    cpu_instr_RST(cpu, 0x0038);
+                    cpu->cycle = 16;
+                    break;
 
         default:    fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION");
                     exit(1);

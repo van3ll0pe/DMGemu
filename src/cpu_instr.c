@@ -401,3 +401,12 @@ uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value)
     //no relative jump
     return 8;
 }
+
+void cpu_instr_RST(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu_instr_PUSH(cpu, cpu->PC);
+    cpu->PC = address;
+}
