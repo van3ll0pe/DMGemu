@@ -91,6 +91,7 @@ typedef struct {
     uint8_t cycle;
 
     bool IME;
+    bool HALT;
 
     Bus* bus;
 

@@ -26,6 +26,7 @@ void cpu_init(Cpu* cpu)
     cpu->opcode = 0;
 
     cpu->IME = false;
+    cpu->HALT = false;
 }
 
 void cpu_link_bus(Cpu* cpu, Bus* bus)
@@ -173,7 +174,11 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
         case 0x0F: break;
         
-        case 0x10: break;
+        case 0x10:  //STOP
+                    cpu_getPCImm8(cpu);
+                    cpu->cycle = 4;
+                    //do nothing
+                    break;
         case 0x11:  //LD DE, n16
                     cpu_instr_LDr16_16(&(cpu->DE.r16), cpu_getPCImm16(cpu));
                     cpu->cycle = 12;
@@ -867,8 +872,13 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_POP(cpu, &(cpu->BC.r16));
                     cpu->cycle = 12;
                     break;
-        case 0xC2: break;
-        case 0xC3: break;
+        case 0xC2:  //JP NZ, a16
+                    cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, Z_FLAG) == 0), cpu_getPCImm16(cpu));
+                    break;
+        case 0xC3:  //JP a16
+                    cpu->cycle = cpu_instr_JP(cpu, true, cpu_getPCImm16(cpu)); //condition is true to take the jump
+                    break;
+
         case 0xC4: break;
         case 0xC5:  //PUSH BC
                     cpu_instr_PUSH(cpu, cpu->BC.r16);
@@ -881,7 +891,9 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xC7: break;
         case 0xC8: break;
         case 0xC9: break;
-        case 0xCA: break;
+        case 0xCA:  //JP Z, a16
+                    cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
+                    break;
         case 0xCB: break;
         case 0xCC: break;
         case 0xCD: break;
@@ -896,7 +908,9 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_POP(cpu, &(cpu->DE.r16));
                     cpu->cycle = 12;
                     break;
-        case 0xD2: break;
+        case 0xD2:  //JP NC, a16
+                    cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, C_FLAG) == 0), cpu_getPCImm16(cpu));
+                    break;
         case 0xD4: break;
         case 0xD5:  //PUSH DE
                     cpu_instr_PUSH(cpu, cpu->DE.r16);
@@ -909,7 +923,9 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xD7: break;
         case 0xD8: break;
         case 0xD9: break;
-        case 0xDA: break;
+        case 0xDA:  //JP C, a16
+                    cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, C_FLAG) == 1), cpu_getPCImm16(cpu));
+                    break;
         case 0xDC: break;
         case 0xDE:  //SBC A, n8
                     cpu_instr_SBC(cpu, cpu_getPCImm8(cpu));
@@ -942,7 +958,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_ADDe8(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 16;
                     break;
-        case 0xE9: break;
+        case 0xE9:  //JP HL
+                    cpu_instr_JP(cpu, true, cpu->HL.r16);
+                    cpu->cycle = 4;
+                    break;
         case 0xEA:  //LD [a16], A
                     cpu_instr_LDmem16_8(cpu, cpu_getPCImm16(cpu), cpu->AF.r8.hi);
                     cpu->cycle = 16;
@@ -966,7 +985,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, (uint16_t)(0xff00 + cpu->BC.r8.lo)));
                     cpu->cycle = 8;
                     break;
-        case 0xF3: break;
+        case 0xF3:  //DI
+                    cpu_instr_DI(cpu);
+                    cpu->cycle = 4;
+                    break;
         case 0xF5:  //PUSH AF
                     cpu_instr_PUSH(cpu, cpu->AF.r16);
                     cpu->cycle = 16;
@@ -988,7 +1010,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->AF.r8.hi), cpu->bus->bus_read8(cpu->bus->component, cpu_getPCImm16(cpu)));
                     cpu->cycle = 16;
                     break;
-        case 0xFB: break;
+        case 0xFB:  //EI
+                    cpu_instr_EI(cpu);
+                    cpu->cycle = 4;
+                    break;
         case 0xFE:  //CP A, n8
                     cpu_instr_CP(cpu, cpu_getPCImm8(cpu));
                     cpu->cycle = 8;

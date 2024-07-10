@@ -332,3 +332,35 @@ void cpu_instr_CPL(Cpu* cpu)
     cpu_setFlag(cpu, N_FLAG);
     cpu_setFlag(cpu, H_FLAG);
 }
+
+void cpu_instr_EI(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->IME = true; 
+}
+
+void cpu_instr_DI(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu->IME = false;
+}
+
+uint8_t cpu_instr_JP(Cpu* cpu, bool condition, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (condition) {
+        cpu->PC = address;
+        return 16;
+    }
+    //no jump
+    return 12;
+}
+
+uint8_t cpu_instr_CALL(Cpu* cpu, bool condition, uint16_t address);
+uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value);
