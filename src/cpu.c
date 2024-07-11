@@ -273,7 +273,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDr8_8(&(cpu->HL.r8.hi), cpu_getPCImm8(cpu));
                     cpu->cycle = 8;
                     break;
-        case 0x27: break;
+        case 0x27:  //DAA
+                    cpu_instr_DAA(cpu);
+                    cpu->cycle = 4;
+                    break;
         case 0x28:  //JR Z, e8
                     cpu->cycle = cpu_instr_JR(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), (int8_t)cpu_getPCImm8(cpu));
                     break;
@@ -591,7 +594,10 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->HL.r8.lo);
                     cpu->cycle = 8;
                     break;
-        case 0x76: break;
+        case 0x76:  //HALT
+                    cpu->HALT = true;
+                    cpu->cycle = 4;
+                    break;
         case 0x77:  ///LD [HL], A
                     cpu_instr_LDmem16_8(cpu, cpu->HL.r16, cpu->AF.r8.hi);
                     cpu->cycle = 8;

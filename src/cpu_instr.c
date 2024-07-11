@@ -471,3 +471,29 @@ void cpu_instr_RRA(Cpu* cpu)
     cpu_clearFlag(cpu, H_FLAG);
     cpu_checkFlag(cpu, C_FLAG, (bit0));
 }
+
+void cpu_instr_DAA(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (!cpu_getFlag(cpu, N_FLAG)) { //last operation is addition
+        if (cpu_getFlag(cpu, C_FLAG) || cpu->AF.r8.hi > 0x99) {
+            cpu->AF.r8.hi  += 0x60;
+            cpu_setFlag(cpu, C_FLAG);
+        }
+        if (cpu_getFlag(cpu, H_FLAG) || (cpu->AF.r8.hi & 0xf) > 0x09) {
+            cpu->AF.r8.hi += 0x6;
+        }
+    } else { //last operation is substraction
+         if (cpu_getFlag(cpu, C_FLAG)) {
+            cpu->AF.r8.hi -= 0x60;
+        }
+        if (cpu_getFlag(cpu, H_FLAG)) {
+            cpu->AF.r8.hi -= 0x6;
+        }
+    }
+
+    cpu_checkFlag(cpu, Z_FLAG, (cpu->AF.r8.hi == 0));
+    cpu_clearFlag(cpu, H_FLAG);
+}

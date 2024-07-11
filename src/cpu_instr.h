@@ -21,6 +21,7 @@ void cpu_instr_OR(Cpu* cpu, uint8_t value);
 void cpu_instr_SBC(Cpu* cpu, uint8_t value);
 void cpu_instr_SUB(Cpu* cpu, uint8_t value);
 void cpu_instr_XOR(Cpu* cpu, uint8_t value);
+void cpu_instr_DAA(Cpu* cpu);
 
 //load operation 8bits
 void cpu_instr_LDr8_8(uint8_t* dst, uint8_t value);
