@@ -50,4 +50,10 @@ uint8_t cpu_instr_CALL(Cpu* cpu, bool condition, uint16_t address); //returns th
 uint8_t cpu_instr_RET(Cpu* cpu, bool condition);
 uint8_t cpu_instr_JR(Cpu* cpu, bool condition, int8_t value); //returns the cycle machine
 void cpu_instr_RST(Cpu* cpu, uint16_t address);
+
+//BIT OPERATIONS
+void cpu_instr_RLCA(Cpu* cpu);
+void cpu_instr_RRCA(Cpu* cpu);
+void cpu_instr_RLA(Cpu* cpu);
+void cpu_instr_RRA(Cpu* cpu);
 #endif //__CPU_INSTR_H__

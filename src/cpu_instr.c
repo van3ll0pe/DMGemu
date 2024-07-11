@@ -410,3 +410,64 @@ void cpu_instr_RST(Cpu* cpu, uint16_t address)
     cpu_instr_PUSH(cpu, cpu->PC);
     cpu->PC = address;
 }
+
+void cpu_instr_RLCA(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t bit7 = (cpu->AF.r8.hi & 0x80) >> 7;
+    cpu->AF.r8.hi <<= 1;
+    cpu->AF.r8.hi |= bit7;
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit7));
+}
+
+void cpu_instr_RRCA(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t bit0 = (cpu->AF.r8.hi & 0x1) << 7;
+    cpu->AF.r8.hi >>= 1;
+
+    cpu->AF.r8.hi |= bit0;
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit0));
+}
+
+void cpu_instr_RLA(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t bit7 = cpu->AF.r8.hi & 0x80;
+    cpu->AF.r8.hi <<= 1;
+    cpu->AF.r8.hi |= cpu_getFlag(cpu, C_FLAG); //set the bit0 with C_FLAG value
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit7));
+}
+
+void cpu_instr_RRA(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t bit0 = cpu->AF.r8.hi & 0x1;
+    cpu->AF.r8.hi >>= 1;
+    cpu->AF.r8.hi |= (cpu_getFlag(cpu, C_FLAG) << 7);
+
+    cpu_clearFlag(cpu, Z_FLAG);
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit0));
+}
