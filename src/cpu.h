@@ -71,6 +71,17 @@ typedef enum {
     C_FLAG = 0x10
 } Flag;
 
+typedef enum {
+    BIT_7 = 0x80,
+    BIT_6 = 0x40,
+    BIT_5 = 0x20,
+    BIT_4 = 0x10,
+    BIT_3 = 0x08,
+    BIT_2 = 0x04,
+    BIT_1 = 0x02,
+    BIT_0 = 0x01
+} BIT;
+
 typedef union {
     uint16_t r16;
     struct {

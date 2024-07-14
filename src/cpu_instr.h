@@ -57,4 +57,26 @@ void cpu_instr_RLCA(Cpu* cpu);
 void cpu_instr_RRCA(Cpu* cpu);
 void cpu_instr_RLA(Cpu* cpu);
 void cpu_instr_RRA(Cpu* cpu);
+
+void cpu_instr_RLC(Cpu* cpu, uint8_t* r8);
+void cpu_instr_RLCHL(Cpu* cpu, uint16_t address);
+void cpu_instr_RRC(Cpu* cpu, uint8_t* r8);
+void cpu_instr_RRCHL(Cpu* cpu, uint16_t address);
+void cpu_instr_RL(Cpu* cpu, uint8_t* r8);
+void cpu_instr_RLHL(Cpu* cpu, uint16_t address);
+void cpu_instr_RR(Cpu* cpu, uint8_t* r8);
+void cpu_instr_RRHL(Cpu* cpu, uint16_t address);
+void cpu_instr_SLA(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SLAHL(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SRA(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SRAHL(Cpu* cpu, uint16_t address);
+void cpu_instr_SRL(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SRLHL(Cpu* cpu, uint16_t address);
+void cpu_instr_SWAP(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SWAPHL(Cpu* cpu, uint16_t address);
+void cpu_instr_BIT(Cpu* cpu, BIT bit, uint8_t value);
+void cpu_instr_RES(Cpu* cpu, BIT bit, uint8_t* r8);
+void cpu_instr_RESHL(Cpu* cpu, BIT bit, uint16_t address);
+void cpu_instr_SET(Cpu* cpu, BIT bit, uint8_t* r8);
+void cpu_instr_SETHL(Cpu* cpu, BIT bit, uint16_t address);
 #endif //__CPU_INSTR_H__

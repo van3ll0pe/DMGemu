@@ -114,6 +114,8 @@ void cpu_execute_instruction(Cpu* cpu)
 {
     if (!cpu)
         exit(1);
+
+    cpu_fetch_instruction(cpu);
     
     switch (cpu->opcode) {
         case 0x00:  //NOP
@@ -934,7 +936,10 @@ void cpu_execute_instruction(Cpu* cpu)
         case 0xCA:  //JP Z, a16
                     cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
                     break;
-        case 0xCB: break;
+        case 0xCB:  //PREFIX CB
+                    cpu_execute_instruction_CB(cpu);
+                    cpu->cycle += 4;
+                    break;
         case 0xCC:  //CALL Z, a16
                     cpu->cycle = cpu_instr_CALL(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
                     break;
@@ -1098,6 +1103,387 @@ void cpu_execute_instruction(Cpu* cpu)
                     break;
 
         default:    fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION");
+                    exit(1);
+    }
+}
+
+void cpu_execute_instruction_CB(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    cpu_fetch_instruction(cpu);
+
+    switch (cpu->opcode) {
+        case 0x00:  //RLC B
+                    cpu_instr_RLC(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x01:  //RLC C
+                    cpu_instr_RLC(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x02:  //RLC D
+                    cpu_instr_RLC(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x03:  //RLC E
+                    cpu_instr_RLC(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x04:  //RLC H
+                    cpu_instr_RLC(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x05:  //RLC L
+                    cpu_instr_RLC(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x06:  //RLC [HL]
+                    cpu_instr_RLCHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x07:  //RLC A
+                    cpu_instr_RLC(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x08:  //RRC B
+                    cpu_instr_RRC(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x09:  //RRC  C
+                    cpu_instr_RRC(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x0A:  //RRC D
+                    cpu_instr_RRC(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x0B:  //RRC E
+                    cpu_instr_RRC(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x0C:  //RRC H
+                    cpu_instr_RRC(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x0D:  //RRC L
+                    cpu_instr_RRC(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x0E:  //RRC [HL]
+                    cpu_instr_RRCHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x0F:  //RRC A
+                    cpu_instr_RRC(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+
+        case 0x10:  //RL B
+                    cpu_instr_RL(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x11:  //RL C
+                    cpu_instr_RL(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x12:  //RL D
+                    cpu_instr_RL(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x13:  //RL E
+                    cpu_instr_RL(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x14:  //RL H
+                    cpu_instr_RL(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x15:  //RL L
+                    cpu_instr_RL(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x16:  //RL [HL]
+                    cpu_instr_RLHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x17:  //RL A
+                    cpu_instr_RL(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x18:  //RR B
+                    cpu_instr_RR(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle  = 8;
+                    break;
+        case 0x19:  //RR C
+                    cpu_instr_RR(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x1A:  //RR D
+                    cpu_instr_RR(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x1B:  //RR E
+                    cpu_instr_RR(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x1C:  //RR H
+                    cpu_instr_RR(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x1D:  //RR L
+                    cpu_instr_RR(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x1E:  //RR [HL]
+                    cpu_instr_RRHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x1F:  //RR A
+                    cpu_instr_RR(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle =  8;
+                    break;
+
+        case 0x20: break;
+        case 0x21: break;
+        case 0x22: break;
+        case 0x23: break;
+        case 0x24: break;
+        case 0x25: break;
+        case 0x26: break;
+        case 0x27: break;
+        case 0x28: break;
+        case 0x29: break;
+        case 0x2A: break;
+        case 0x2B: break;
+        case 0x2C: break;
+        case 0x2D: break;
+        case 0x2E: break;
+        case 0x2F: break;
+
+        case 0x30: break;
+        case 0x31: break;
+        case 0x32: break;
+        case 0x33: break;
+        case 0x34: break;
+        case 0x35: break;
+        case 0x36: break;
+        case 0x37: break;
+        case 0x38: break;
+        case 0x39: break;
+        case 0x3A: break;
+        case 0x3B: break;
+        case 0x3C: break;
+        case 0x3D: break;
+        case 0x3E: break;
+        case 0x3F: break;
+
+        case 0x40: break;
+        case 0x41: break;
+        case 0x42: break;
+        case 0x43: break;
+        case 0x44: break;
+        case 0x45: break;
+        case 0x46: break;
+        case 0x47: break;
+        case 0x48: break;
+        case 0x49: break;
+        case 0x4A: break;
+        case 0x4B: break;
+        case 0x4C: break;
+        case 0x4D: break;
+        case 0x4E: break;
+        case 0x4F: break;
+
+        case 0x50: break;
+        case 0x51: break;
+        case 0x52: break;
+        case 0x53: break;
+        case 0x54: break;
+        case 0x55: break;
+        case 0x56: break;
+        case 0x57: break;
+        case 0x58: break;
+        case 0x59: break;
+        case 0x5A: break;
+        case 0x5B: break;
+        case 0x5C: break;
+        case 0x5D: break;
+        case 0x5E: break;
+        case 0x5F: break;
+
+        case 0x60: break;
+        case 0x61: break;
+        case 0x62: break;
+        case 0x63: break;
+        case 0x64: break;
+        case 0x65: break;
+        case 0x66: break;
+        case 0x67: break;
+        case 0x68: break;
+        case 0x69: break;
+        case 0x6A: break;
+        case 0x6B: break;
+        case 0x6C: break;
+        case 0x6D: break;
+        case 0x6E: break;
+        case 0x6F: break;
+
+        case 0x70: break;
+        case 0x71: break;
+        case 0x72: break;
+        case 0x73: break;
+        case 0x74: break;
+        case 0x75: break;
+        case 0x76: break;
+        case 0x77: break;
+        case 0x78: break;
+        case 0x79: break;
+        case 0x7A: break;
+        case 0x7B: break;
+        case 0x7C: break;
+        case 0x7D: break;
+        case 0x7E: break;
+        case 0x7F: break;
+
+        case 0x80: break;
+        case 0x81: break;
+        case 0x82: break;
+        case 0x83: break;
+        case 0x84: break;
+        case 0x85: break;
+        case 0x86: break;
+        case 0x87: break;
+        case 0x88: break;
+        case 0x89: break;
+        case 0x8A: break;
+        case 0x8B: break;
+        case 0x8C: break;
+        case 0x8D: break;
+        case 0x8E: break;
+        case 0x8F: break;
+
+        case 0x90: break;
+        case 0x91: break;
+        case 0x92: break;
+        case 0x93: break;
+        case 0x94: break;
+        case 0x95: break;
+        case 0x96: break;
+        case 0x97: break;
+        case 0x98: break;
+        case 0x99: break;
+        case 0x9A: break;
+        case 0x9B: break;
+        case 0x9C: break;
+        case 0x9D: break;
+        case 0x9E: break;
+        case 0x9F: break;
+
+        case 0xA0: break;
+        case 0xA1: break;
+        case 0xA2: break;
+        case 0xA3: break;
+        case 0xA4: break;
+        case 0xA5: break;
+        case 0xA6: break;
+        case 0xA7: break;
+        case 0xA8: break;
+        case 0xA9: break;
+        case 0xAA: break;
+        case 0xAB: break;
+        case 0xAC: break;
+        case 0xAD: break;
+        case 0xAE: break;
+        case 0xAF: break;
+
+        case 0xB0: break;
+        case 0xB1: break;
+        case 0xB2: break;
+        case 0xB3: break;
+        case 0xB4: break;
+        case 0xB5: break;
+        case 0xB6: break;
+        case 0xB7: break;
+        case 0xB8: break;
+        case 0xB9: break;
+        case 0xBA: break;
+        case 0xBB: break;
+        case 0xBC: break;
+        case 0xBD: break;
+        case 0xBE: break;
+        case 0xBF: break;
+
+        case 0xC0: break;
+        case 0xC1: break;
+        case 0xC2: break;
+        case 0xC3: break;
+        case 0xC4: break;
+        case 0xC5: break;
+        case 0xC6: break;
+        case 0xC7: break;
+        case 0xC8: break;
+        case 0xC9: break;
+        case 0xCA: break;
+        case 0xCB: break;
+        case 0xCC: break;
+        case 0xCD: break;
+        case 0xCE: break;
+        case 0xCF: break;
+
+        case 0xD0: break;
+        case 0xD1: break;
+        case 0xD2: break;
+        case 0xD3: break;
+        case 0xD4: break;
+        case 0xD5: break;
+        case 0xD6: break;
+        case 0xD7: break;
+        case 0xD8: break;
+        case 0xD9: break;
+        case 0xDA: break;
+        case 0xDB: break;
+        case 0xDC: break;
+        case 0xDD: break;
+        case 0xDE: break;
+        case 0xDF: break;
+
+        case 0xE0: break;
+        case 0xE1: break;
+        case 0xE2: break;
+        case 0xE3: break;
+        case 0xE4: break;
+        case 0xE5: break;
+        case 0xE6: break;
+        case 0xE7: break;
+        case 0xE8: break;
+        case 0xE9: break;
+        case 0xEA: break;
+        case 0xEB: break;
+        case 0xEC: break;
+        case 0xED: break;
+        case 0xEE: break;
+        case 0xEF: break;
+
+        case 0xF0: break;
+        case 0xF1: break;
+        case 0xF2: break;
+        case 0xF3: break;
+        case 0xF4: break;
+        case 0xF5: break;
+        case 0xF6: break;
+        case 0xF7: break;
+        case 0xF8: break;
+        case 0xF9: break;
+        case 0xFA: break;
+        case 0xFB: break;
+        case 0xFC: break;
+        case 0xFD: break;
+        case 0xFE: break;
+        case 0xFF: break;
+
+        default: fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION CB");
                     exit(1);
     }
 }
