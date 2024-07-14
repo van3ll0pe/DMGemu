@@ -1245,22 +1245,70 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle =  8;
                     break;
 
-        case 0x20: break;
-        case 0x21: break;
-        case 0x22: break;
-        case 0x23: break;
-        case 0x24: break;
-        case 0x25: break;
-        case 0x26: break;
-        case 0x27: break;
-        case 0x28: break;
-        case 0x29: break;
-        case 0x2A: break;
-        case 0x2B: break;
-        case 0x2C: break;
-        case 0x2D: break;
-        case 0x2E: break;
-        case 0x2F: break;
+        case 0x20:  //SLA B
+                    cpu_instr_SLA(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle =  8;
+                    break;
+        case 0x21:  //SLA C
+                    cpu_instr_SLA(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x22:  //SLA D
+                    cpu_instr_SLA(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x23:  //SLA E
+                    cpu_instr_SLA(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x24:  //SLA H
+                    cpu_instr_SLA(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x25:  //SLA L
+                    cpu_instr_SLA(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x26:  //SLA [HL]
+                    cpu_instr_SLAHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x27:  //SLA A
+                    cpu_instr_SLA(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x28:  //SRA B
+                    cpu_instr_SRA(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x29:  //SRA C
+                    cpu_instr_SRA(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x2A:  //SRA D
+                    cpu_instr_SRA(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x2B:  //SRA E
+                    cpu_instr_SRA(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x2C:  //SRA H
+                    cpu_instr_SRA(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x2D:  //SRA L
+                    cpu_instr_SRA(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x2E:  //SRA [HL]
+                    cpu_instr_SRAHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x2F:  //SRA A
+                    cpu_instr_SRA(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
         case 0x30: break;
         case 0x31: break;

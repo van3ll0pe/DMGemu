@@ -67,7 +67,7 @@ void cpu_instr_RLHL(Cpu* cpu, uint16_t address);
 void cpu_instr_RR(Cpu* cpu, uint8_t* r8);
 void cpu_instr_RRHL(Cpu* cpu, uint16_t address);
 void cpu_instr_SLA(Cpu* cpu, uint8_t* r8);
-void cpu_instr_SLAHL(Cpu* cpu, uint8_t* r8);
+void cpu_instr_SLAHL(Cpu* cpu, uint16_t address);
 void cpu_instr_SRA(Cpu* cpu, uint8_t* r8);
 void cpu_instr_SRAHL(Cpu* cpu, uint16_t address);
 void cpu_instr_SRL(Cpu* cpu, uint8_t* r8);

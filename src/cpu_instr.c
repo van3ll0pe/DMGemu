@@ -626,3 +626,69 @@ void cpu_instr_RRHL(Cpu* cpu, uint16_t address)
     cpu_clearFlag(cpu, H_FLAG);
     cpu_checkFlag(cpu, C_FLAG, (bit0));
 }
+
+void cpu_instr_SLA(Cpu* cpu, uint8_t* r8)
+{
+    if (!cpu || !r8)
+        exit(1);
+    
+    uint8_t bit7 = (*r8) & 0x80;
+    (*r8) <<= 1; //bit 0 is set to 0
+
+    cpu_checkFlag(cpu, Z_FLAG, (*r8 == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit7));
+}
+
+void cpu_instr_SLAHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, address);
+    uint8_t bit7 = value & 0x80;
+    value <<= 1; //bit 0 is set to 0
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
+
+    cpu_checkFlag(cpu, Z_FLAG, (value == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit7));
+}
+
+void cpu_instr_SRA(Cpu* cpu, uint8_t* r8)
+{
+    if (!cpu || !r8)
+        exit(1);
+    
+    uint8_t bit7 = (*r8) & 0x80;
+    uint8_t bit0 = (*r8) & 0x01;
+
+    (*r8) >>= 1;
+    (*r8) |= bit7; //the bit7 keeps his value
+
+    cpu_checkFlag(cpu, Z_FLAG, (*r8 == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG,  (bit0));
+}
+
+void cpu_instr_SRAHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, address);
+    uint8_t bit7 = value & 0x80;
+    uint8_t bit0 = value & 0x01;
+
+    value >>= 1;
+    value |= bit7; //the bit7 keeps his value
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
+
+    cpu_checkFlag(cpu, Z_FLAG, (value == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG,  (bit0));
+}
