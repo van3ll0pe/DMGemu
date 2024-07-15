@@ -1895,73 +1895,169 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
 
-        case 0xC0: break;
-        case 0xC1: break;
-        case 0xC2: break;
-        case 0xC3: break;
-        case 0xC4: break;
-        case 0xC5: break;
-        case 0xC6: break;
-        case 0xC7: break;
-        case 0xC8: break;
-        case 0xC9: break;
-        case 0xCA: break;
-        case 0xCB: break;
-        case 0xCC: break;
-        case 0xCD: break;
-        case 0xCE: break;
-        case 0xCF: break;
+        case 0xC0:  //SET 0, B
+                    cpu_instr_SET(cpu, BIT_0, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC1:  //SET 0, C
+                    cpu_instr_SET(cpu, BIT_0, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC2:  //SET 0, D
+                    cpu_instr_SET(cpu, BIT_0, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC3:  //SET 0, E
+                    cpu_instr_SET(cpu, BIT_0, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC4:  //SET 0, H
+                    cpu_instr_SET(cpu, BIT_0, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC5:  //SET 0, L
+                    cpu_instr_SET(cpu, BIT_0, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC6:  //SET 0, [HL]
+                    cpu_instr_SETHL(cpu, BIT_0, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xC7:  //SET 0, A
+                    cpu_instr_SET(cpu, BIT_0, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC8:  //SET 1, B
+                    cpu_instr_SET(cpu, BIT_1, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xC9:  //SET 1, C
+                    cpu_instr_SET(cpu, BIT_1, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xCA:  //SET 1, D
+                    cpu_instr_SET(cpu, BIT_1, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xCB:  //SET 1, E
+                    cpu_instr_SET(cpu, BIT_1, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xCC:  //SET 1, H
+                    cpu_instr_SET(cpu, BIT_1, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xCD:  //SET 1, L
+                    cpu_instr_SET(cpu, BIT_1, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xCE:  //SET 1, [HL]
+                    cpu_instr_SETHL(cpu, BIT_1, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xCF:  //SET 1, A
+                    cpu_instr_SET(cpu, BIT_1, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0xD0: break;
-        case 0xD1: break;
-        case 0xD2: break;
-        case 0xD3: break;
-        case 0xD4: break;
-        case 0xD5: break;
-        case 0xD6: break;
-        case 0xD7: break;
-        case 0xD8: break;
-        case 0xD9: break;
-        case 0xDA: break;
-        case 0xDB: break;
-        case 0xDC: break;
-        case 0xDD: break;
-        case 0xDE: break;
-        case 0xDF: break;
+        case 0xD0:  //SET 2, B
+                    break;
+        case 0xD1:  //SET 2, C
+                    break;
+        case 0xD2:  //SET 2, D
+                    break;
+        case 0xD3:  //SET 2, E
+                    break;
+        case 0xD4:  //SET 2, H
+                    break;
+        case 0xD5:  //SET 2, L
+                    break;
+        case 0xD6:  //SET 2, [HL]
+                    break;
+        case 0xD7:  //SET 2, A
+                    break;
+        case 0xD8:  //SET 3, B
+                    break;
+        case 0xD9:  //SET 3, C
+                    break;
+        case 0xDA:  //SET 3, D
+                    break;
+        case 0xDB:  //SET 3, E
+                    break;
+        case 0xDC:  //SET 3, H
+                    break;
+        case 0xDD:  //SET 3, L
+                    break;
+        case 0xDE:  //SET 3, [HL]
+                    break;
+        case 0xDF:  //SET 3, A
+                    break;
 
-        case 0xE0: break;
-        case 0xE1: break;
-        case 0xE2: break;
-        case 0xE3: break;
-        case 0xE4: break;
-        case 0xE5: break;
-        case 0xE6: break;
-        case 0xE7: break;
-        case 0xE8: break;
-        case 0xE9: break;
-        case 0xEA: break;
-        case 0xEB: break;
-        case 0xEC: break;
-        case 0xED: break;
-        case 0xEE: break;
-        case 0xEF: break;
+        case 0xE0:  //SET 4, B
+                    break;
+        case 0xE1:  //SET 4, C
+                    break;
+        case 0xE2:  //SET 4, D
+                    break;
+        case 0xE3:  //SET 4, E
+                    break;
+        case 0xE4:  //SET 4, H
+                    break;
+        case 0xE5:  //SET 4, L
+                    break;
+        case 0xE6:  //SET 4, [HL]
+                    break;
+        case 0xE7:  //SET 4, A
+                    break;
+        case 0xE8:  //SET 5, B
+                    break;
+        case 0xE9:  //SET 5, C
+                    break;
+        case 0xEA:  //SET 5, D
+                    break;
+        case 0xEB:  //SET 5, E
+                    break;
+        case 0xEC:  //SET 5, H
+                    break;
+        case 0xED:  //SET 5, L
+                    break;
+        case 0xEE:  //SET 5, [HL]
+                    break;
+        case 0xEF:  //SET 5, A
+                    break;
 
-        case 0xF0: break;
-        case 0xF1: break;
-        case 0xF2: break;
-        case 0xF3: break;
-        case 0xF4: break;
-        case 0xF5: break;
-        case 0xF6: break;
-        case 0xF7: break;
-        case 0xF8: break;
-        case 0xF9: break;
-        case 0xFA: break;
-        case 0xFB: break;
-        case 0xFC: break;
-        case 0xFD: break;
-        case 0xFE: break;
-        case 0xFF: break;
+        case 0xF0:  //SET 6, B
+                    break;
+        case 0xF1:  //SET 6, C
+                    break;
+        case 0xF2:  //SET 6, D
+                    break;
+        case 0xF3:  //SET 6, E
+                    break;
+        case 0xF4:  //SET 6, H
+                    break;
+        case 0xF5:  //SET 6, L
+                    break;
+        case 0xF6:  //SET 6, [HL]
+                    break;
+        case 0xF7:  //SET 6, A
+                    break;
+        case 0xF8:  //SET 7, B
+                    break;
+        case 0xF9:  //SET 7, C
+                    break;
+        case 0xFA:  //SET 7, D
+                    break;
+        case 0xFB:  //SET 7, E
+                    break;
+        case 0xFC:  //SET 7, H
+                    break;
+        case 0xFD:  //SET 7, L
+                    break;
+        case 0xFE:  //SET 7, [HL]
+                    break;
+        case 0xFF:  //SET 7, A
+                    break;
 
         default: fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION CB");
                     exit(1);
