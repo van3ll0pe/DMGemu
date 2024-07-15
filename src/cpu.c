@@ -1416,7 +1416,7 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0x4A:  //BIT 1, D
-                    cpu_instr_BIT(cpu,  BIT_1,  cpu->DE.r8.hi);
+                    cpu_instr_BIT(cpu, BIT_1, cpu->DE.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x4B:  //BIT 1, E
@@ -1485,7 +1485,7 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0x5B:  //BIT 3, E
-                    cpu_instr_BIT(cpu, BIT_3,  cpu->DE.r8.lo);
+                    cpu_instr_BIT(cpu, BIT_3, cpu->DE.r8.lo);
                     cpu->cycle = 8;
                     break;
         case 0x5C:  //BIT 3, H
@@ -1554,7 +1554,7 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
         case 0x6C:  //BIT 5, H
-                    cpu_instr_BIT(cpu, BIT_5,  cpu->HL.r8.hi);
+                    cpu_instr_BIT(cpu, BIT_5, cpu->HL.r8.hi);
                     cpu->cycle = 8;
                     break;
         case 0x6D:  //BIT 5, L
@@ -1635,73 +1635,265 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
 
-        case 0x80: break;
-        case 0x81: break;
-        case 0x82: break;
-        case 0x83: break;
-        case 0x84: break;
-        case 0x85: break;
-        case 0x86: break;
-        case 0x87: break;
-        case 0x88: break;
-        case 0x89: break;
-        case 0x8A: break;
-        case 0x8B: break;
-        case 0x8C: break;
-        case 0x8D: break;
-        case 0x8E: break;
-        case 0x8F: break;
+        case 0x80:  //RES 0, B
+                    cpu_instr_RES(cpu, BIT_0, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x81:  //RES 0, C
+                    cpu_instr_RES(cpu, BIT_0, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x82:  //RES 0, D
+                    cpu_instr_RES(cpu, BIT_0, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x83:  //RES 0, E
+                    cpu_instr_RES(cpu, BIT_0, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x84:  //RES 0, H
+                    cpu_instr_RES(cpu, BIT_0, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x85:  //RES 0, L
+                    cpu_instr_RES(cpu, BIT_0, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x86:  //RES 0, [HL]
+                    cpu_instr_RESHL(cpu, BIT_0, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x87:  //RES 0, A
+                    cpu_instr_RES(cpu, BIT_0, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x88:  //RES 1, B
+                    cpu_instr_RES(cpu, BIT_1, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x89:  //RES 1, C
+                    cpu_instr_RES(cpu, BIT_1, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x8A:  //RES 1, D
+                    cpu_instr_RES(cpu, BIT_1, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x8B:  //RES 1, E
+                    cpu_instr_RES(cpu, BIT_1, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x8C:  //RES 1, H
+                    cpu_instr_RES(cpu, BIT_1, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x8D:  //RES 1, L
+                    cpu_instr_RES(cpu, BIT_1, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x8E:  //RES 1, [HL]
+                    cpu_instr_RESHL(cpu, BIT_1, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x8F:  //RES 1, A
+                    cpu_instr_RES(cpu, BIT_1, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0x90: break;
-        case 0x91: break;
-        case 0x92: break;
-        case 0x93: break;
-        case 0x94: break;
-        case 0x95: break;
-        case 0x96: break;
-        case 0x97: break;
-        case 0x98: break;
-        case 0x99: break;
-        case 0x9A: break;
-        case 0x9B: break;
-        case 0x9C: break;
-        case 0x9D: break;
-        case 0x9E: break;
-        case 0x9F: break;
+        case 0x90:  //RES 2, B
+                    cpu_instr_RES(cpu, BIT_2, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x91:  //RES 2, C
+                    cpu_instr_RES(cpu, BIT_2, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x92:  //RES 2, D
+                    cpu_instr_RES(cpu, BIT_2, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x93:  //RES 2, E
+                    cpu_instr_RES(cpu, BIT_2, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x94:  //RES 2, H
+                    cpu_instr_RES(cpu, BIT_2, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x95:  //RES 2, L
+                    cpu_instr_RES(cpu, BIT_2, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x96:  //RES 2, [HL]
+                    cpu_instr_RESHL(cpu, BIT_2, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x97:  //RES 2, A
+                    cpu_instr_RES(cpu, BIT_2, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x98:  //RES 3, B
+                    cpu_instr_RES(cpu, BIT_3, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x99:  //RES 3, C
+                    cpu_instr_RES(cpu, BIT_3, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x9A:  //RES 3, D
+                    cpu_instr_RES(cpu, BIT_3, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x9B:  //RES 3, E
+                    cpu_instr_RES(cpu, BIT_3, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x9C:  //RES 3, H
+                    cpu_instr_RES(cpu, BIT_3, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x9D:  //RES 3, L
+                    cpu_instr_RES(cpu, BIT_3, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x9E:  //RES 3, [HL]
+                    cpu_instr_RESHL(cpu, BIT_3, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x9F:  //RES 3, A
+                    cpu_instr_RES(cpu, BIT_3, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0xA0: break;
-        case 0xA1: break;
-        case 0xA2: break;
-        case 0xA3: break;
-        case 0xA4: break;
-        case 0xA5: break;
-        case 0xA6: break;
-        case 0xA7: break;
-        case 0xA8: break;
-        case 0xA9: break;
-        case 0xAA: break;
-        case 0xAB: break;
-        case 0xAC: break;
-        case 0xAD: break;
-        case 0xAE: break;
-        case 0xAF: break;
+        case 0xA0:  //RES 4, B
+                    cpu_instr_RES(cpu, BIT_4, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA1:  //RES 4, C
+                    cpu_instr_RES(cpu, BIT_4, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA2:  //RES 4, D
+                    cpu_instr_RES(cpu, BIT_4, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA3:  //RES 4, E
+                    cpu_instr_RES(cpu, BIT_4, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA4:  //RES 4, H
+                    cpu_instr_RES(cpu, BIT_4, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA5:  //RES 4, L
+                    cpu_instr_RES(cpu, BIT_4, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA6:  //RES 4, [HL]
+                    cpu_instr_RESHL(cpu, BIT_4, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xA7:  //RES 4, A
+                    cpu_instr_RES(cpu, BIT_4, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA8:  //RES 5, B
+                    cpu_instr_RES(cpu, BIT_5, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xA9:  //RES 5, C
+                    cpu_instr_RES(cpu, BIT_5, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xAA:  //RES 5, D
+                    cpu_instr_RES(cpu, BIT_5, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xAB:  //RES 5, E
+                    cpu_instr_RES(cpu, BIT_5, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xAC:  //RES 5, H
+                    cpu_instr_RES(cpu, BIT_5, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xAD:  //RES 5, L
+                    cpu_instr_RES(cpu, BIT_5, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xAE:  //RES 5, [HL]
+                    cpu_instr_RESHL(cpu, BIT_5, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xAF:  //RES 5, A
+                    cpu_instr_RES(cpu, BIT_5, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0xB0: break;
-        case 0xB1: break;
-        case 0xB2: break;
-        case 0xB3: break;
-        case 0xB4: break;
-        case 0xB5: break;
-        case 0xB6: break;
-        case 0xB7: break;
-        case 0xB8: break;
-        case 0xB9: break;
-        case 0xBA: break;
-        case 0xBB: break;
-        case 0xBC: break;
-        case 0xBD: break;
-        case 0xBE: break;
-        case 0xBF: break;
+        case 0xB0:  //RES 6, B
+                    cpu_instr_RES(cpu, BIT_6, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB1:  //RES 6, C
+                    cpu_instr_RES(cpu, BIT_6, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB2:  //RES 6, D
+                    cpu_instr_RES(cpu, BIT_6, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB3:  //RES 6, E
+                    cpu_instr_RES(cpu, BIT_6, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB4:  //RES 6, H
+                    cpu_instr_RES(cpu, BIT_6, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB5:  //RES 6, L
+                    cpu_instr_RES(cpu, BIT_6, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB6:  //RES 6, [HL]
+                    cpu_instr_RESHL(cpu, BIT_6, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xB7:  //RES 6, A
+                    cpu_instr_RES(cpu, BIT_6, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB8:  //RES 7, B
+                    cpu_instr_RES(cpu, BIT_7, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xB9:  //RES 7, C
+                    cpu_instr_RES(cpu, BIT_7, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xBA:  //RES 7, D
+                    cpu_instr_RES(cpu, BIT_7, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xBB:  //RES 7, E
+                    cpu_instr_RES(cpu, BIT_7, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xBC:  //RES 7, H
+                    cpu_instr_RES(cpu, BIT_7, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0xBD:  //RES 7, L
+                    cpu_instr_RES(cpu, BIT_7, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0xBE:  //RES 7, [HL]
+                    cpu_instr_RESHL(cpu, BIT_7, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0xBF:  //RES 7, A
+                    cpu_instr_RES(cpu, BIT_7, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
         case 0xC0: break;
         case 0xC1: break;

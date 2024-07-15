@@ -766,3 +766,39 @@ void cpu_instr_BIT(Cpu* cpu, BIT bit, uint8_t value)
     cpu_clearFlag(cpu, N_FLAG);
     cpu_setFlag(cpu, H_FLAG);
 }
+
+void cpu_instr_RES(Cpu* cpu, BIT bit, uint8_t* r8)
+{
+    if (!cpu || !r8)
+        exit(1);
+    
+    (*r8) &= ~bit;
+}
+
+void cpu_instr_RESHL(Cpu* cpu, BIT bit, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16);
+    value &= ~bit;
+    cpu->bus->bus_write8(cpu->bus->component, cpu->HL.r16, value);
+}
+
+void cpu_instr_SET(Cpu* cpu, BIT bit, uint8_t* r8)
+{
+    if  (!cpu || !r8)
+        exit(1);
+    
+    (*r8) |= bit;
+}
+
+void cpu_instr_SETHL(Cpu* cpu, BIT bit, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, address);
+    value |= bit;
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
+}
