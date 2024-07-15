@@ -1310,90 +1310,330 @@ void cpu_execute_instruction_CB(Cpu* cpu)
                     cpu->cycle = 8;
                     break;
 
-        case 0x30: break;
-        case 0x31: break;
-        case 0x32: break;
-        case 0x33: break;
-        case 0x34: break;
-        case 0x35: break;
-        case 0x36: break;
-        case 0x37: break;
-        case 0x38: break;
-        case 0x39: break;
-        case 0x3A: break;
-        case 0x3B: break;
-        case 0x3C: break;
-        case 0x3D: break;
-        case 0x3E: break;
-        case 0x3F: break;
+        case 0x30:  //SWAP B
+                    cpu_instr_SWAP(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x31:  //SWAP C
+                    cpu_instr_SWAP(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x32:  //SWAP D
+                    cpu_instr_SWAP(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x33:  //SWAP E
+                    cpu_instr_SWAP(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x34:  //SWAP H
+                    cpu_instr_SWAP(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x35:  //SWAP L
+                    cpu_instr_SWAP(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x36:  //SWAP [HL]
+                    cpu_instr_SWAPHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x37:  //SWAP A
+                    cpu_instr_SWAP(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x38:  //SRL B
+                    cpu_instr_SRL(cpu, &cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x39:  //SRL C
+                    cpu_instr_SRL(cpu, &cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x3A:  //SRL D
+                    cpu_instr_SRL(cpu, &cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x3B:  //SRL E
+                    cpu_instr_SRL(cpu, &cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x3C:  //SRL H
+                    cpu_instr_SRL(cpu, &cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x3D:  //SRL L
+                    cpu_instr_SRL(cpu, &cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x3E:  //SRL [HL]
+                    cpu_instr_SRLHL(cpu, cpu->HL.r16);
+                    cpu->cycle = 16;
+                    break;
+        case 0x3F:  //SRL A
+                    cpu_instr_SRL(cpu, &cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0x40: break;
-        case 0x41: break;
-        case 0x42: break;
-        case 0x43: break;
-        case 0x44: break;
-        case 0x45: break;
-        case 0x46: break;
-        case 0x47: break;
-        case 0x48: break;
-        case 0x49: break;
-        case 0x4A: break;
-        case 0x4B: break;
-        case 0x4C: break;
-        case 0x4D: break;
-        case 0x4E: break;
-        case 0x4F: break;
+        case 0x40:  //BIT 0, B
+                    cpu_instr_BIT(cpu, BIT_0, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x41:  //BIT 0, C
+                    cpu_instr_BIT(cpu, BIT_0, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x42:  //BIT 0, D
+                    cpu_instr_BIT(cpu, BIT_0, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x43:  //BIT 0, E
+                    cpu_instr_BIT(cpu, BIT_0, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x44:  //BIT 0, H
+                    cpu_instr_BIT(cpu, BIT_0, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x45:  //BIT 0, L
+                    cpu_instr_BIT(cpu, BIT_0, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x46:  //BIT 0, [HL]
+                    cpu_instr_BIT(cpu, BIT_0, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x47:  //BIT 0, A
+                    cpu_instr_BIT(cpu, BIT_0, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x48:  //BIT 1, B
+                    cpu_instr_BIT(cpu, BIT_1, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x49:  //BIT 1, C
+                    cpu_instr_BIT(cpu, BIT_1, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x4A:  //BIT 1, D
+                    cpu_instr_BIT(cpu,  BIT_1,  cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x4B:  //BIT 1, E
+                    cpu_instr_BIT(cpu, BIT_1, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x4C:  //BIT 1, H
+                    cpu_instr_BIT(cpu, BIT_1, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x4D:  //BIT 1, L
+                    cpu_instr_BIT(cpu, BIT_1, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x4E:  //BIT 1, [HL]
+                    cpu_instr_BIT(cpu, BIT_1, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x4F:  //BIT 1, A
+                    cpu_instr_BIT(cpu, BIT_1, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0x50: break;
-        case 0x51: break;
-        case 0x52: break;
-        case 0x53: break;
-        case 0x54: break;
-        case 0x55: break;
-        case 0x56: break;
-        case 0x57: break;
-        case 0x58: break;
-        case 0x59: break;
-        case 0x5A: break;
-        case 0x5B: break;
-        case 0x5C: break;
-        case 0x5D: break;
-        case 0x5E: break;
-        case 0x5F: break;
+        case 0x50:  //BIT 2, B
+                    cpu_instr_BIT(cpu, BIT_2, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x51:  //BIT 2, C
+                    cpu_instr_BIT(cpu, BIT_2, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x52:  //BIT 2, D
+                    cpu_instr_BIT(cpu, BIT_2, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x53:  //BIT 2, E
+                    cpu_instr_BIT(cpu, BIT_2, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x54:  //BIT 2, H
+                    cpu_instr_BIT(cpu, BIT_2, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x55:  //BIT 2, L
+                    cpu_instr_BIT(cpu, BIT_2, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x56:  //BIT 2, [HL]
+                    cpu_instr_BIT(cpu, BIT_2, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x57:  //BIT 2, A
+                    cpu_instr_BIT(cpu, BIT_2, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x58:  //BIT 3, B
+                    cpu_instr_BIT(cpu, BIT_3,  cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x59:  //BIT 3, C
+                    cpu_instr_BIT(cpu, BIT_3, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x5A:  //BIT 3, D
+                    cpu_instr_BIT(cpu, BIT_3, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x5B:  //BIT 3, E
+                    cpu_instr_BIT(cpu, BIT_3,  cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x5C:  //BIT 3, H
+                    cpu_instr_BIT(cpu, BIT_3, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x5D:  //BIT 3, L
+                    cpu_instr_BIT(cpu, BIT_3, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x5E:  //BIT 3, [HL]
+                    cpu_instr_BIT(cpu, BIT_3, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x5F:  //BIT 3, A
+                    cpu_instr_BIT(cpu, BIT_3, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0x60: break;
-        case 0x61: break;
-        case 0x62: break;
-        case 0x63: break;
-        case 0x64: break;
-        case 0x65: break;
-        case 0x66: break;
-        case 0x67: break;
-        case 0x68: break;
-        case 0x69: break;
-        case 0x6A: break;
-        case 0x6B: break;
-        case 0x6C: break;
-        case 0x6D: break;
-        case 0x6E: break;
-        case 0x6F: break;
+        case 0x60:  //BIT 4, B
+                    cpu_instr_BIT(cpu, BIT_4, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x61:  //BIT 4, C
+                    cpu_instr_BIT(cpu, BIT_4, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x62:  //BIT 4, D
+                    cpu_instr_BIT(cpu, BIT_4, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x63:  //BIT 4, E
+                    cpu_instr_BIT(cpu, BIT_4, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x64:  //BIT 4, H
+                    cpu_instr_BIT(cpu, BIT_4, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x65:  //BIT 4, L
+                    cpu_instr_BIT(cpu, BIT_4, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x66:  //BIT 4, [HL]
+                    cpu_instr_BIT(cpu, BIT_4, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x67:  //BIT 4, A
+                    cpu_instr_BIT(cpu, BIT_4, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x68:  //BIT 5, B
+                    cpu_instr_BIT(cpu, BIT_5, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x69:  //BIT 5, C
+                    cpu_instr_BIT(cpu, BIT_5, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x6A:  //BIT 5, D
+                    cpu_instr_BIT(cpu, BIT_5, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x6B:  //BIT 5, E
+                    cpu_instr_BIT(cpu, BIT_5, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x6C:  //BIT 5, H
+                    cpu_instr_BIT(cpu, BIT_5,  cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x6D:  //BIT 5, L
+                    cpu_instr_BIT(cpu, BIT_5, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x6E:  //BIT 5, [HL]
+                    cpu_instr_BIT(cpu, BIT_5, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x6F:  //BIT 5, A
+                    cpu_instr_BIT(cpu, BIT_5, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
-        case 0x70: break;
-        case 0x71: break;
-        case 0x72: break;
-        case 0x73: break;
-        case 0x74: break;
-        case 0x75: break;
-        case 0x76: break;
-        case 0x77: break;
-        case 0x78: break;
-        case 0x79: break;
-        case 0x7A: break;
-        case 0x7B: break;
-        case 0x7C: break;
-        case 0x7D: break;
-        case 0x7E: break;
-        case 0x7F: break;
+        case 0x70:  //BIT 6, B
+                    cpu_instr_BIT(cpu, BIT_6, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x71:  //BIT 6, C
+                    cpu_instr_BIT(cpu, BIT_6, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x72:  //BIT 6, D
+                    cpu_instr_BIT(cpu, BIT_6,  cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x73:  //BIT 6, E
+                    cpu_instr_BIT(cpu, BIT_6, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x74:  //BIT 6, H
+                    cpu_instr_BIT(cpu, BIT_6, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x75:  //BIT 6, L
+                    cpu_instr_BIT(cpu, BIT_6, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x76:  //BIT 6, [HL]
+                    cpu_instr_BIT(cpu, BIT_6, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x77:  //BIT 6, A
+                    cpu_instr_BIT(cpu, BIT_6, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x78:  //BIT 7, B
+                    cpu_instr_BIT(cpu, BIT_7, cpu->BC.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x79:  //BIT 7, C
+                    cpu_instr_BIT(cpu, BIT_7, cpu->BC.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x7A:  //BIT 7, D
+                    cpu_instr_BIT(cpu, BIT_7, cpu->DE.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x7B:  //BIT 7, E
+                    cpu_instr_BIT(cpu, BIT_7, cpu->DE.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x7C:  //BIT 7, H
+                    cpu_instr_BIT(cpu, BIT_7, cpu->HL.r8.hi);
+                    cpu->cycle = 8;
+                    break;
+        case 0x7D:  //BIT 7, L
+                    cpu_instr_BIT(cpu, BIT_7, cpu->HL.r8.lo);
+                    cpu->cycle = 8;
+                    break;
+        case 0x7E:  //BIT 7, [HL]
+                    cpu_instr_BIT(cpu, BIT_7, cpu->bus->bus_read8(cpu->bus->component, cpu->HL.r16));
+                    cpu->cycle = 12;
+                    break;
+        case 0x7F:  //BIT 7, A
+                    cpu_instr_BIT(cpu, BIT_7, cpu->AF.r8.hi);
+                    cpu->cycle = 8;
+                    break;
 
         case 0x80: break;
         case 0x81: break;

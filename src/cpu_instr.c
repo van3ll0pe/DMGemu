@@ -692,3 +692,77 @@ void cpu_instr_SRAHL(Cpu* cpu, uint16_t address)
     cpu_clearFlag(cpu, H_FLAG);
     cpu_checkFlag(cpu, C_FLAG,  (bit0));
 }
+
+void cpu_instr_SWAP(Cpu* cpu, uint8_t* r8)
+{
+    if (!cpu || !r8)
+        exit(1);
+    
+    uint8_t upper_nybble = ((*r8) & 0xF0) >> 4;
+    (*r8) <<= 4;
+    (*r8) |= upper_nybble;
+
+    cpu_checkFlag(cpu, Z_FLAG, (*r8 == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_clearFlag(cpu, C_FLAG);
+}
+
+void cpu_instr_SWAPHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, address);
+    uint8_t upper_nybble = (value & 0xF0) >> 4;
+    value <<= 4;
+    value |= upper_nybble;
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
+
+    cpu_checkFlag(cpu, Z_FLAG, (value == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_clearFlag(cpu, C_FLAG);
+}
+
+void cpu_instr_SRL(Cpu* cpu, uint8_t* r8)
+{
+    if (!cpu || !r8)
+        exit(1);
+    
+    uint8_t bit0 = (*r8) & 0x01;
+    (*r8) >>= 1;
+
+    cpu_checkFlag(cpu, Z_FLAG, (*r8 == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit0));
+}
+
+void cpu_instr_SRLHL(Cpu* cpu, uint16_t address)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, address);
+    uint8_t bit0 = value & 0x01;
+    value >>= 1;
+    cpu->bus->bus_write8(cpu->bus->component, address, value);
+
+    cpu_checkFlag(cpu, Z_FLAG, (value == 0));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_clearFlag(cpu, H_FLAG);
+    cpu_checkFlag(cpu, C_FLAG, (bit0));
+}
+
+void cpu_instr_BIT(Cpu* cpu, BIT bit, uint8_t value)
+{
+    if (!cpu)
+        exit(1);
+    
+    uint8_t bit = value & bit;
+
+    cpu_checkFlag(cpu, Z_FLAG, (!bit));
+    cpu_clearFlag(cpu, N_FLAG);
+    cpu_setFlag(cpu, H_FLAG);
+}
