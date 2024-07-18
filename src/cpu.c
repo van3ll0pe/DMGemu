@@ -23,7 +23,6 @@ void cpu_init(Cpu* cpu)
     cpu->HL.r8.hi = 0x01; //reg H
 
     cpu->cycle = 0;
-    cpu->opcode = 0;
 
     cpu->IME = false;
     cpu->HALT = false;
@@ -101,23 +100,92 @@ uint16_t cpu_getPCImm16(Cpu* cpu)
     return data;
 }
 
-void cpu_fetch_instruction(Cpu* cpu)
+uint8_t cpu_fetch_instruction(Cpu* cpu)
 {
     if (!cpu)
         exit(1);
     
-    cpu->opcode = cpu->bus->bus_read8(cpu->bus->component, cpu->PC);
+    uint8_t opcode = cpu->bus->bus_read8(cpu->bus->component, cpu->PC);
     cpu->PC++;
+
+    return opcode;
 }
 
-void cpu_execute_instruction(Cpu* cpu)
+static void handle_interrupt(Cpu* cpu, uint8_t interrupt, uint8_t interrupt_type,uint16_t interrupt_address)
+{
+    //clear the bit requesting interrupt
+    uint8_t value = cpu->bus->bus_read8(cpu->bus->component, IF);
+    value &= ~interrupt_type;
+    cpu->bus->bus_write8(cpu->bus->component, IF, value);
+
+    cpu_instr_PUSH(cpu, cpu->PC);
+    cpu->PC = interrupt_address;
+
+    cpu->IME = false;
+}
+
+void handle_interrupts(Cpu* cpu)
+{
+    uint8_t ie_reg = cpu->bus->bus_read8(cpu->bus->component, IE);
+    uint8_t if_reg = cpu->bus->bus_read8(cpu->bus->component, IF);
+    uint8_t requested_interrupt = ie_reg & if_reg;
+
+    if (requested_interrupt == 0x0) return;
+
+    if (cpu->HALT == true && requested_interrupt != 0x0) { //halt is desactivated if interrupt is requested even if EMI is false
+        cpu->HALT = false;
+
+        if (cpu->IME == false) { //HALTBUG
+            uint16_t current_PC = cpu->PC;
+            uint8_t opcode_next_instr = cpu->bus->bus_read8(cpu->bus->component, cpu->PC);
+
+            if (opcode_next_instr == 0xCB) {
+                //not call cpu_execute_instruction because CB will increment PC in the case of BC
+                uint8_t opcode_cb = cpu->bus->bus_read8(cpu->bus->component, cpu->PC + 1);
+                cpu_execute_instruction_CB(cpu, opcode_cb);
+            } else { 
+                cpu_execute_instruction(cpu, opcode_next_instr);
+            }
+
+            cpu->PC = current_PC; //in the case of RST or CALL instruction
+        }
+    }
+    if (cpu->IME == false)
+        return;
+    
+    //VBLANK
+    if (VBLANK & requested_interrupt) {
+        handle_interrupt(cpu, requested_interrupt, VBLANK, VBLANK_ADDR);
+        return;
+    }
+    //LCD
+    if (LCD & requested_interrupt) {
+        handle_interrupt(cpu, requested_interrupt, LCD, LCD_ADDR);
+        return;
+    }
+    //TIMER
+    if (TIMER & requested_interrupt) {
+        handle_interrupt(cpu, requested_interrupt, TIMER, TIMER_ADDR);
+        return;
+    }
+    //SERIAL
+    if (SERIAL & requested_interrupt) {
+        handle_interrupt(cpu, requested_interrupt, SERIAL, SERIAL_ADDR);
+        return;
+    }
+    //JOYPAD
+    if (JOYPAD & requested_interrupt) {
+        handle_interrupt(cpu, requested_interrupt, JOYPAD, JOYPAD_ADDR);
+        return;
+    }
+}
+
+void cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
 {
     if (!cpu)
         exit(1);
-
-    cpu_fetch_instruction(cpu);
     
-    switch (cpu->opcode) {
+    switch (opcode) {
         case 0x00:  //NOP
                     cpu->cycle = 4;
                     break;
@@ -937,7 +1005,8 @@ void cpu_execute_instruction(Cpu* cpu)
                     cpu->cycle = cpu_instr_JP(cpu, (cpu_getFlag(cpu, Z_FLAG) == 1), cpu_getPCImm16(cpu));
                     break;
         case 0xCB:  //PREFIX CB
-                    cpu_execute_instruction_CB(cpu);
+                    uint8_t opcode_cb = cpu_fetch_instruction(cpu); //get next opcode cb and increment PC
+                    cpu_execute_instruction_CB(cpu, opcode_cb);
                     cpu->cycle += 4;
                     break;
         case 0xCC:  //CALL Z, a16
@@ -1107,14 +1176,12 @@ void cpu_execute_instruction(Cpu* cpu)
     }
 }
 
-void cpu_execute_instruction_CB(Cpu* cpu)
+void cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode)
 {
     if (!cpu)
         exit(1);
-    
-    cpu_fetch_instruction(cpu);
 
-    switch (cpu->opcode) {
+    switch (opcode) {
         case 0x00:  //RLC B
                     cpu_instr_RLC(cpu, &cpu->BC.r8.hi);
                     cpu->cycle = 8;

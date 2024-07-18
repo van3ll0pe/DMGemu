@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "bus.h"
 #include <stdbool.h>
+#include "hard_registers.h"
 
 
 typedef enum {
@@ -24,6 +25,21 @@ typedef enum {
     BIT_0 = 0x01
 } BIT;
 
+typedef enum
+{
+    JOYPAD  = 0x10,
+    SERIAL  = 0x08,
+    TIMER   = 0x04,
+    LCD     = 0x02,
+    VBLANK  = 0x01
+}interrupts;
+
+#define VBLANK_ADDR 0x0040
+#define LCD_ADDR    0x0048
+#define TIMER_ADDR  0x0050
+#define SERIAL_ADDR 0x0058
+#define JOYPAD_ADDR 0x0060
+
 typedef union {
     uint16_t r16;
     struct {
@@ -41,7 +57,6 @@ typedef struct {
     uint16_t PC;
     uint16_t SP;
 
-    uint8_t opcode;
     uint8_t cycle;
 
     bool IME;
@@ -54,9 +69,9 @@ typedef struct {
 void cpu_init(Cpu* cpu);
 void cpu_link_bus(Cpu* cpu, Bus* bus);
 
-void cpu_fetch_instruction(Cpu* cpu);
-void cpu_execute_instruction(Cpu* cpu);
-void cpu_execute_instruction_CB(Cpu* cpu);
+uint8_t cpu_fetch_instruction(Cpu* cpu);
+void cpu_execute_instruction(Cpu* cpu, uint8_t opcode);
+void cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode);
 
 uint8_t cpu_getPCImm8(Cpu* cpu);
 uint16_t cpu_getPCImm16(Cpu* cpu);
@@ -65,6 +80,8 @@ void cpu_setFlag(Cpu* cpu, Flag flag);
 void cpu_clearFlag(Cpu* cpu, Flag flag);
 void cpu_checkFlag(Cpu* cpu, Flag flag, bool condition);
 uint8_t cpu_getFlag(Cpu* cpu, Flag flag);
+
+void handle_interrupts(Cpu* cpu);
 
 
 
