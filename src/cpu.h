@@ -60,7 +60,8 @@ typedef struct {
     uint8_t cycle;
 
     bool IME;
-    bool HALT;
+    bool is_HALT;
+    bool is_STOP;
 
     Bus* bus;
 
@@ -72,6 +73,8 @@ void cpu_link_bus(Cpu* cpu, Bus* bus);
 uint8_t cpu_fetch_instruction(Cpu* cpu);
 void cpu_execute_instruction(Cpu* cpu, uint8_t opcode);
 void cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode);
+void cpu_tick(Cpu* cpu);
+
 
 uint8_t cpu_getPCImm8(Cpu* cpu);
 uint16_t cpu_getPCImm16(Cpu* cpu);

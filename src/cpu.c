@@ -25,7 +25,8 @@ void cpu_init(Cpu* cpu)
     cpu->cycle = 0;
 
     cpu->IME = false;
-    cpu->HALT = false;
+    cpu->is_HALT = false;
+    cpu->is_STOP = false;
 }
 
 void cpu_link_bus(Cpu* cpu, Bus* bus)
@@ -111,6 +112,19 @@ uint8_t cpu_fetch_instruction(Cpu* cpu)
     return opcode;
 }
 
+void cpu_tick(Cpu* cpu)
+{
+    if (!cpu)
+        exit(1);
+    
+    if (cpu->is_HALT == true || cpu->is_STOP)
+        cpu->cycle = 4;
+        return;
+
+    uint8_t opcode = cpu_fetch_instruction(cpu);
+    cpu_execute_instruction(cpu, opcode);
+}
+
 static void handle_interrupt(Cpu* cpu, uint8_t interrupt, uint8_t interrupt_type,uint16_t interrupt_address)
 {
     //clear the bit requesting interrupt
@@ -132,8 +146,11 @@ void handle_interrupts(Cpu* cpu)
 
     if (requested_interrupt == 0x0) return;
 
-    if (cpu->HALT == true && requested_interrupt != 0x0) { //halt is desactivated if interrupt is requested even if EMI is false
-        cpu->HALT = false;
+    if (cpu->is_STOP == true && requested_interrupt != 0x0) //stop is desactivated if interrupt is requested
+        cpu->is_STOP = false;
+
+    if (cpu->is_HALT == true && requested_interrupt != 0x0) { //halt is desactivated if interrupt is requested even if EMI is false
+        cpu->is_HALT = false;
 
         if (cpu->IME == false) { //HALTBUG
             uint16_t current_PC = cpu->PC;
@@ -253,7 +270,7 @@ void cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x10:  //STOP
                     cpu_getPCImm8(cpu);
                     cpu->cycle = 4;
-                    //do nothing
+                    cpu->is_STOP = true;
                     break;
         case 0x11:  //LD DE, n16
                     cpu_instr_LDr16_16(&(cpu->DE.r16), cpu_getPCImm16(cpu));
@@ -665,7 +682,7 @@ void cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
                     cpu->cycle = 8;
                     break;
         case 0x76:  //HALT
-                    cpu->HALT = true;
+                    cpu->is_HALT = true;
                     cpu->cycle = 4;
                     break;
         case 0x77:  ///LD [HL], A
