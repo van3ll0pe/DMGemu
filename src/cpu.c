@@ -117,7 +117,7 @@ void cpu_tick(Cpu* cpu)
     if (!cpu)
         exit(1);
     
-    if (cpu->is_HALT == true || cpu->is_STOP)
+    if (cpu->is_HALT == true || cpu->is_STOP == true)
         cpu->cycle = 4;
         return;
 
