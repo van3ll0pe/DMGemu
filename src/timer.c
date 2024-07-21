@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "timer.h"
 #include "hard_registers.h"
 

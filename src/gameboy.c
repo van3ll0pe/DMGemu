@@ -1,4 +1,5 @@
 #include "gameboy.h"
+#include <stdlib.h>
 
 void gameboy_init(Gameboy* gameboy)
 {

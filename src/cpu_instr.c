@@ -1,4 +1,5 @@
 #include "cpu.h"
+#include <stdlib.h>
 
 /**************** 8bit arithmetic and logic instructions **********************/
 
@@ -760,9 +761,9 @@ void cpu_instr_BIT(Cpu* cpu, BIT bit, uint8_t value)
     if (!cpu)
         exit(1);
     
-    uint8_t bit = value & bit;
+    uint8_t bit_check = value & bit;
 
-    cpu_checkFlag(cpu, Z_FLAG, (!bit));
+    cpu_checkFlag(cpu, Z_FLAG, (!bit_check));
     cpu_clearFlag(cpu, N_FLAG);
     cpu_setFlag(cpu, H_FLAG);
 }
