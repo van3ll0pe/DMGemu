@@ -49,8 +49,8 @@ void joypad_updateP1(Bus* bus, Joypad* joypad)
         exit(1);
     
     uint8_t hr_p1 = bus->bus_read8(bus->component, P1) | 0xCF;
-    uint8_t requested_button = hr_p1 & 0x20;
-    uint8_t requested_dpad = hr_p1 & 0x10;
+    uint8_t requested_button = !(hr_p1 & 0x20);
+    uint8_t requested_dpad = !(hr_p1 & 0x10);
 
     if ((requested_button && joypad->button_a) || (requested_dpad && joypad->button_right))
         hr_p1 &= ~0x01;
