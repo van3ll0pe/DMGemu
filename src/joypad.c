@@ -72,6 +72,8 @@ void get_event(Bus* bus, Joypad* joypad)
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
         if (event.type == SDL_KEYDOWN) { //key pressed
+            if (event.key.repeat)
+                break;
             joypad_buttonPressed(joypad_getAssociatedKey(joypad, event.key.keysym.sym));
         }
         if (event.type == SDL_KEYUP) { //key released
