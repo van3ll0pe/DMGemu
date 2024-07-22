@@ -53,27 +53,20 @@ void joypad_updateP1(Bus* bus, Joypad* joypad)
     uint8_t hr_p1 = bus->bus_read8(bus->component, P1) | 0xCF;
     uint8_t requested_button = !(hr_p1 & 0x20);
     uint8_t requested_dpad = !(hr_p1 & 0x10);
-    bool modified = false;
 
-    if ((requested_button && joypad->button_a) || (requested_dpad && joypad->button_right)) {
-        modified = true;
+    if ((requested_button && joypad->button_a) || (requested_dpad && joypad->button_right))
         hr_p1 &= ~0x01;
-    }
         
-    if ((requested_button && joypad->button_b) || (requested_dpad && joypad->button_left)) {
-        modified = true;
+    if ((requested_button && joypad->button_b) || (requested_dpad && joypad->button_left))
         hr_p1 &= ~0x02;
-    }
-    if ((requested_button && joypad->button_select) || (requested_dpad && joypad->button_up)) {
-        modified = true;
+
+    if ((requested_button && joypad->button_select) || (requested_dpad && joypad->button_up))
         hr_p1 &= ~0x04;
-    }
-    if ((requested_button && joypad->button_start) || (requested_dpad && joypad->button_down)) {
-        modified = true;
-        hr_p1 &= ~0x08;
-    }
     
-    if (modified == true) //requesting joypad interrupt in IF hard register
+    if ((requested_button && joypad->button_start) || (requested_dpad && joypad->button_down))
+        hr_p1 &= ~0x08;
+    
+    if ((hr_p1 & 0xF) != 0xF) //requesting joypad interrupt in IF hard register
         bus->bus_write8(bus->component, IF, (bus->bus_read8(bus->component, IF) | 0x10));
 
     bus->bus_write8(bus->component, P1, hr_p1); 
