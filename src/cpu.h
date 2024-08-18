@@ -2,10 +2,9 @@
 #define __CPU_H__
 
 #include <stdint.h>
-#include "bus.h"
 #include <stdbool.h>
 #include "hard_registers.h"
-
+#include "memory.h"
 
 typedef enum {
     Z_FLAG = 0x80,
@@ -57,34 +56,32 @@ typedef struct {
     uint16_t PC;
     uint16_t SP;
 
-    uint8_t cycle;
-
     bool IME;
     bool is_HALT;
-    bool is_STOP;
+    uint8_t ei_delay;
 
-    Bus* bus;
+    Memory* bus;
 
 } Cpu;
 
-void cpu_init(Cpu* cpu);
-void cpu_link_bus(Cpu* cpu, Bus* bus);
+void cpu_init(Cpu* cpu, Memory* memory);
 
-uint8_t cpu_fetch_instruction(Cpu* cpu);
-void cpu_execute_instruction(Cpu* cpu, uint8_t opcode);
-void cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode);
-void cpu_tick(Cpu* cpu);
+uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode);
+uint32_t cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode);
+
+void cpu_update_ei(Cpu* cpu);
+void cpu_ticks(Cpu* cpu);
 
 
-uint8_t cpu_getPCImm8(Cpu* cpu);
-uint16_t cpu_getPCImm16(Cpu* cpu);
+uint8_t cpu_fetch_byte_pc(Cpu* cpu);
+uint16_t cpu_fetch_word_pc(Cpu* cpu);
 
 void cpu_setFlag(Cpu* cpu, Flag flag);
 void cpu_clearFlag(Cpu* cpu, Flag flag);
-void cpu_checkFlag(Cpu* cpu, Flag flag, bool condition);
+void cpu_updateFlag(Cpu* cpu, Flag flag, bool condition);
 uint8_t cpu_getFlag(Cpu* cpu, Flag flag);
 
-void handle_interrupts(Cpu* cpu);
+uint32_t handle_interrupts(Cpu* cpu);
 
 
 
