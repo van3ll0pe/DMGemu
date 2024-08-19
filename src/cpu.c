@@ -197,15 +197,15 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x04: { cpu->BC.r8.hi = instr_inc8(cpu, cpu->BC.r8.hi); return 4; } //INC B
         case 0x05: { cpu->BC.r8.hi = instr_dec8(cpu, cpu->BC.r8.hi); return 4; } //DEC B
         case 0x06: { cpu->BC.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD B, n8
-        case 0x07: return 0;
+        case 0x07: { cpu->AF.r8.hi = instr_rlc(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RLCA
         case 0x08: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->SP); return 20; } //LD (a16), SP
-        case 0x09: return 0;
+        case 0x09: { instr_add16(cpu, cpu->BC.r16); return 8; } //ADD HL, BC
         case 0x0A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->BC.r16); return 8; } //LD A, (BC)
         case 0x0B: { instr_dec16(&cpu->BC.r16); return 8; } //DEC BC
         case 0x0C: { cpu->BC.r8.lo = instr_inc8(cpu, cpu->BC.r8.lo); return 4; } //INC C
         case 0x0D: { cpu->BC.r8.lo = instr_dec8(cpu, cpu->BC.r8.lo); return 4; } //DEC C
         case 0x0E: { cpu->BC.r8.lo = cpu_fetch_byte_pc(cpu); return 8; } //LD C, n8
-        case 0x0F: return 0;
+        case 0x0F: {cpu->AF.r8.hi = instr_rrc(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RRCA
 
         case 0x10: { cpu_fetch_byte_pc(cpu); return 4; } //STOP
         case 0x11: { cpu->DE.r16 = cpu_fetch_word_pc(cpu); return 12; } //LD DE, n16
@@ -214,15 +214,15 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x14: { cpu->DE.r8.hi = instr_inc8(cpu, cpu->DE.r8.hi); return 4; } //INC D
         case 0x15: { cpu->DE.r8.hi = instr_dec8(cpu, cpu->DE.r8.hi); return 4; } //DEC D
         case 0x16: { cpu->DE.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD D, n8
-        case 0x17: return 0;
+        case 0x17: { cpu->AF.r8.hi = instr_rl(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RLA
         case 0x18: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); cpu->PC += e8; return 12; } //JR e8
-        case 0x19: return 0;
+        case 0x19: { instr_add16(cpu, cpu->DE.r16); return 8; } //ADD HL, DE
         case 0x1A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->DE.r16); return 8; } //LD A, (DE)
         case 0x1B: { instr_dec16(&cpu->DE.r16); return 8; } //DEC DE
         case 0x1C: { cpu->DE.r8.lo = instr_inc8(cpu, cpu->DE.r8.lo); return 4; } //INC E
         case 0x1D: { cpu->DE.r8.lo = instr_dec8(cpu, cpu->DE.r8.lo); return 4; } //DEC E
         case 0x1E: { cpu->DE.r8.lo = cpu_fetch_byte_pc(cpu); return 8; } //LD E, n8
-        case 0x1F: return 0;
+        case 0x1F: { cpu->AF.r8.hi = instr_rr(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RRA
 
         case 0x20: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 0) { cpu->PC += e8; return 12; } else { return 8; }} //JR NZ, e8
         case 0x21: { cpu->HL.r16 = cpu_fetch_word_pc(cpu); return 12; } //LD HL, n16
@@ -231,15 +231,15 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x24: { cpu->HL.r8.hi = instr_inc8(cpu, cpu->HL.r8.hi); return 4; } //INC H
         case 0x25: { cpu->HL.r8.hi = instr_dec8(cpu, cpu->HL.r8.hi); return 4; } //DEC H
         case 0x26: { cpu->HL.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD H, n8
-        case 0x27: return 0;
+        case 0x27: { instr_daa(cpu); return 4; } //DAA
         case 0x28: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 1) { cpu->PC += e8; return 12; } else { return 8; }} //JR Z, e8
-        case 0x29: return 0;
+        case 0x29: { instr_add16(cpu, cpu->HL.r16); return 8; } //ADD HL, HL
         case 0x2A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->HL.r16); cpu->HL.r16++; return 8; } //LD A, (HL+)
         case 0x2B: { instr_dec16(&cpu->HL.r16); return 8; } //DEC HL
         case 0x2C: { cpu->HL.r8.lo = instr_inc8(cpu, cpu->HL.r8.lo); return 4; } //INC L
         case 0x2D: { cpu->HL.r8.lo = instr_dec8(cpu, cpu->HL.r8.lo); return 4; } //DEC L
         case 0x2E: { cpu->HL.r8.lo = cpu_fetch_byte_pc(cpu); return 8; } //LD L, n8
-        case 0x2F: return 0;
+        case 0x2F: { instr_cpl(cpu); return 4; } //CPL
 
         case 0x30: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 0) { cpu->PC += e8; return 12; } else { return 8; }} //JR NC, e8
         case 0x31: { cpu->SP = cpu_fetch_word_pc(cpu); return 12; } //LD SP, n16
@@ -248,15 +248,15 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x34: { memory_write8(cpu->bus, cpu->HL.r16, instr_inc8(cpu, memory_read8(cpu->bus, cpu->HL.r16))); return 12; } //INC (HL)
         case 0x35: { memory_write8(cpu->bus, cpu->HL.r16, instr_dec8(cpu, memory_read8(cpu->bus, cpu->HL.r16))); return 12; } //DEC (HL)
         case 0x36: { memory_write8(cpu->bus, cpu->HL.r16, cpu_fetch_byte_pc(cpu)); return 12; } //LD (HL), n8
-        case 0x37: return 0;
+        case 0x37: { instr_scf(cpu); return 4; } //SCF
         case 0x38: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 1) { cpu->PC += e8; return 12; } else { return 8; }} //JR C, e8
-        case 0x39: return 0;
+        case 0x39: { instr_add16(cpu, cpu->SP); return 8; } //ADD HL, SP
         case 0x3A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->HL.r16); cpu->HL.r16--; return 8; } //LD A, (HL-)
         case 0x3B: { instr_dec16(&cpu->SP); return 8; } //DEC SP
         case 0x3C: { cpu->AF.r8.hi = instr_inc8(cpu, cpu->AF.r8.hi); return 4; } //INC A
         case 0x3D: { cpu->AF.r8.hi = instr_dec8(cpu, cpu->AF.r8.hi); return 4; } //DEC A
         case 0x3E: { cpu->AF.r8.hi = cpu_fetch_byte_pc(cpu); return 8; }; //LD A, n8
-        case 0x3F: return 0;
+        case 0x3F: { instr_ccf(cpu); return 4; } //CCF
 
         case 0x40:  { cpu->BC.r8.hi = cpu->BC.r8.hi; return 4; } //LD B, B
         case 0x41:  { cpu->BC.r8.hi = cpu->BC.r8.lo; return 4; } //LD B, C
@@ -326,73 +326,73 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x7E: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->HL.r16); return 8; } //LD A, (HL)
         case 0x7F: { cpu->AF.r8.hi = cpu->AF.r8.hi; return 4; } //LD A, A
 
-        case 0x80: return 0;
-        case 0x81: return 0;
-        case 0x82: return 0;
-        case 0x83: return 0;
-        case 0x84: return 0;
-        case 0x85: return 0;
-        case 0x86: return 0;
-        case 0x87: return 0;
-        case 0x88: return 0;
-        case 0x89: return 0;
-        case 0x8A: return 0;
-        case 0x8B: return 0;
-        case 0x8C: return 0;
-        case 0x8D: return 0;
-        case 0x8E: return 0;
-        case 0x8F: return 0;
+        case 0x80: { instr_add8(cpu, cpu->BC.r8.hi); return 4; } //ADD A, B
+        case 0x81: { instr_add8(cpu, cpu->BC.r8.lo); return 4; } //ADD A, C
+        case 0x82: { instr_add8(cpu, cpu->DE.r8.hi); return 4; } //ADD A, D
+        case 0x83: { instr_add8(cpu, cpu->DE.r8.lo); return 4; } //ADD A, E
+        case 0x84: { instr_add8(cpu, cpu->HL.r8.hi); return 4; } //ADD A, H
+        case 0x85: { instr_add8(cpu, cpu->HL.r8.lo); return 4; } //ADD A, L
+        case 0x86: { instr_add8(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //ADD A, (HL)
+        case 0x87: { instr_add8(cpu, cpu->AF.r8.hi); return 4; } //ADD A, A
+        case 0x88: { instr_adc(cpu, cpu->BC.r8.hi); return 4; } //ADC A, B
+        case 0x89: { instr_adc(cpu, cpu->BC.r8.lo); return 4; } //ADC A, C
+        case 0x8A: { instr_adc(cpu, cpu->DE.r8.hi); return 4; } //ADC A, D
+        case 0x8B: { instr_adc(cpu, cpu->DE.r8.lo); return 4; } //ADC A, E
+        case 0x8C: { instr_adc(cpu, cpu->HL.r8.hi); return 4; } //ADC A, H
+        case 0x8D: { instr_adc(cpu, cpu->HL.r8.lo); return 4; } //ADC A, L
+        case 0x8E: { instr_adc(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //ADC A, (HL)
+        case 0x8F: { instr_adc(cpu, cpu->AF.r8.hi); return 4; } //ADC A, A
 
-        case 0x90: return 0;
-        case 0x91: return 0;
-        case 0x92: return 0;
-        case 0x93: return 0;
-        case 0x94: return 0;
-        case 0x95: return 0;
-        case 0x96: return 0;
-        case 0x97: return 0;
-        case 0x98: return 0;
-        case 0x99: return 0;
-        case 0x9A: return 0;
-        case 0x9B: return 0;
-        case 0x9C: return 0;
-        case 0x9D: return 0;
-        case 0x9E: return 0;
-        case 0x9F: return 0;
+        case 0x90: { instr_sub(cpu, cpu->BC.r8.hi); return 4; } //SUB A, B
+        case 0x91: { instr_sub(cpu, cpu->BC.r8.lo); return 4; } //SUB A, C
+        case 0x92: { instr_sub(cpu, cpu->DE.r8.hi); return 4; } //SUB A, D
+        case 0x93: { instr_sub(cpu, cpu->DE.r8.lo); return 4; } //SUB A, E
+        case 0x94: { instr_sub(cpu, cpu->HL.r8.hi); return 4; } //SUB A, H
+        case 0x95: { instr_sub(cpu, cpu->HL.r8.lo); return 4; } //SUB A, L
+        case 0x96: { instr_sub(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //SUB A, (HL)
+        case 0x97: { instr_sub(cpu, cpu->AF.r8.hi); return 4; } //SUB A, A
+        case 0x98: { instr_sbc(cpu, cpu->BC.r8.hi); return 4; } //SBC A, B
+        case 0x99: { instr_sbc(cpu, cpu->BC.r8.lo); return 4; } //SBC A, C
+        case 0x9A: { instr_sbc(cpu, cpu->DE.r8.hi); return 4; } //SBC A, D
+        case 0x9B: { instr_sbc(cpu, cpu->DE.r8.lo); return 4; } //SBC A, E
+        case 0x9C: { instr_sbc(cpu, cpu->HL.r8.hi); return 4; } //SBC A, H
+        case 0x9D: { instr_sbc(cpu, cpu->HL.r8.lo); return 4; } //SBC A, L
+        case 0x9E: { instr_sbc(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //SBC A, (HL)
+        case 0x9F: { instr_sbc(cpu, cpu->AF.r8.hi); return 4; } //SBC A, A
 
-        case 0xA0: return 0;
-        case 0xA1: return 0;
-        case 0xA2: return 0;
-        case 0xA3: return 0;
-        case 0xA4: return 0;
-        case 0xA5: return 0;
-        case 0xA6: return 0;
-        case 0xA7: return 0;
-        case 0xA8: return 0;
-        case 0xA9: return 0;
-        case 0xAA: return 0;
-        case 0xAB: return 0;
-        case 0xAC: return 0;
-        case 0xAD: return 0;
-        case 0xAE: return 0;
-        case 0xAF: return 0;
+        case 0xA0: { instr_and(cpu, cpu->BC.r8.hi); return 4; } //AND A, B
+        case 0xA1: { instr_and(cpu, cpu->BC.r8.lo); return 4; } //AND A, C
+        case 0xA2: { instr_and(cpu, cpu->DE.r8.hi); return 4; } //AND A, D
+        case 0xA3: { instr_and(cpu, cpu->DE.r8.lo); return 4; } //AND A, E
+        case 0xA4: { instr_and(cpu, cpu->HL.r8.hi); return 4; } //AND A, H
+        case 0xA5: { instr_and(cpu, cpu->HL.r8.lo); return 4; } //AND A, L
+        case 0xA6: { instr_and(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //AND A, (HL)
+        case 0xA7: { instr_and(cpu, cpu->AF.r8.hi); return 4; } //AND A, A
+        case 0xA8: { instr_xor(cpu, cpu->BC.r8.hi); return 4; } //XOR A, B
+        case 0xA9: { instr_xor(cpu, cpu->BC.r8.lo); return 4; } //XOR A, C
+        case 0xAA: { instr_xor(cpu, cpu->DE.r8.hi); return 4; } //XOR A, D
+        case 0xAB: { instr_xor(cpu, cpu->DE.r8.lo); return 4; } //XOR A, E
+        case 0xAC: { instr_xor(cpu, cpu->HL.r8.hi); return 4; } //XOR A, H
+        case 0xAD: { instr_xor(cpu, cpu->HL.r8.lo); return 4; } //XOR A, L
+        case 0xAE: { instr_xor(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //XOR A, (HL)
+        case 0xAF: { instr_xor(cpu, cpu->AF.r8.hi); return 4; } //XOR A, A
 
-        case 0xB0: return 0;
-        case 0xB1: return 0;
-        case 0xB2: return 0;
-        case 0xB3: return 0;
-        case 0xB4: return 0;
-        case 0xB5: return 0;
-        case 0xB6: return 0;
-        case 0xB7: return 0;
-        case 0xB8: return 0;
-        case 0xB9: return 0;
-        case 0xBA: return 0;
-        case 0xBB: return 0;
-        case 0xBC: return 0;
-        case 0xBD: return 0;
-        case 0xBE: return 0;
-        case 0xBF: return 0;
+        case 0xB0: { instr_or(cpu, cpu->BC.r8.hi); return 4; } //OR A, B
+        case 0xB1: { instr_or(cpu, cpu->BC.r8.lo); return 4; } //OR A, C
+        case 0xB2: { instr_or(cpu, cpu->DE.r8.hi); return 4; } //OR A, D
+        case 0xB3: { instr_or(cpu, cpu->DE.r8.lo); return 4; } //OR A, E
+        case 0xB4: { instr_or(cpu, cpu->HL.r8.hi); return 4; } //OR A, H
+        case 0xB5: { instr_or(cpu, cpu->HL.r8.lo); return 4; } //OR A, L
+        case 0xB6: { instr_or(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //OR A, (HL)
+        case 0xB7: { instr_or(cpu, cpu->AF.r8.hi); return 4; } //OR A, A
+        case 0xB8: { instr_cp(cpu, cpu->BC.r8.hi); return 4; } //CP A, B
+        case 0xB9: { instr_cp(cpu, cpu->BC.r8.lo); return 4; } //CP A, C
+        case 0xBA: { instr_cp(cpu, cpu->DE.r8.hi); return 4; } //CP A, D
+        case 0xBB: { instr_cp(cpu, cpu->DE.r8.lo); return 4; } //CP A, E
+        case 0xBC: { instr_cp(cpu, cpu->HL.r8.hi); return 4; } //CP A, H
+        case 0xBD: { instr_cp(cpu, cpu->HL.r8.lo); return 4; } //CP A, L
+        case 0xBE: { instr_cp(cpu, memory_read8(cpu->bus, cpu->HL.r16)); return 8; } //CP A, (HL)
+        case 0xBF: { instr_cp(cpu, cpu->AF.r8.hi); return 4; } //CP A, A
 
         case 0xC0: { if (cpu_getFlag(cpu, Z_FLAG) == 0) { cpu->PC = instr_pop(cpu); return 20; } else { return 8; } } //RET NZ
         case 0xC1: { cpu->BC.r16 = instr_pop(cpu); return 12; } //POP BC
@@ -400,7 +400,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xC3: { cpu->PC = cpu_fetch_word_pc(cpu); return 16; } //JP a16
         case 0xC4: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 0) {instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } else { return 12; }} //CALL NZ, a16
         case 0xC5: { instr_push(cpu, cpu->BC.r16); return 16; } //PUSH BC
-        case 0xC6: return 0;
+        case 0xC6: { instr_add8(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //ADD A, n8
         case 0xC7: { instr_push(cpu, cpu->PC); cpu->PC = 0x0000; return 16; } //RST $00
         case 0xC8: { if (cpu_getFlag(cpu, Z_FLAG) == 1) { cpu->PC = instr_pop(cpu); return 20; } else { return 8; } } //RET Z
         case 0xC9: { cpu->PC = instr_pop(cpu); return 16; } //RET
@@ -408,7 +408,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xCB: { uint8_t opcb = cpu_fetch_byte_pc(cpu); return cpu_execute_instruction_CB(cpu, opcb) + 4; } //PREFIX CB
         case 0xCC: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 1) {instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } else { return 12; }} //CALL Z, a16
         case 0xCD: { uint16_t a16 = cpu_fetch_word_pc(cpu); instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } //CALL a16
-        case 0xCE: return 0;
+        case 0xCE: { instr_adc(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //ADC A, n8
         case 0xCF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0008; return 16; } //RST $08
 
         case 0xD0: { if (cpu_getFlag(cpu, C_FLAG) == 0) { cpu->PC = instr_pop(cpu); return 20; } else { return 8; } } //RET NC
@@ -416,25 +416,25 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xD2: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 0) { cpu->PC = a16; return 16; } else { return 12; }} //JP NC, a16
         case 0xD4: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 0) { instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } else { return 12; }} //CALL NC, a16
         case 0xD5: { instr_push(cpu, cpu->DE.r16); return 16; } //PUSH DE
-        case 0xD6: return 0;
+        case 0xD6: { instr_sub(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //SUB A, n8
         case 0xD7: { instr_push(cpu, cpu->PC); cpu->PC = 0x0010; return 16; } //RST $10
         case 0xD8: { if (cpu_getFlag(cpu, C_FLAG) == 1) { cpu->PC = instr_pop(cpu); return 20; } else { return 8; } } //RET C
         case 0xD9: { cpu->IME = true; cpu->PC = instr_pop(cpu); return 16; } //RETI (no delay time like ei to enable IME)
         case 0xDA: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 1) { cpu->PC = a16; return 16; } else { return 12; }} //JP C, a16
         case 0xDC: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 1) { instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } else { return 12; }} //CALL C, a16
-        case 0xDE: return 0;
+        case 0xDE: { instr_sbc(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //SBC A, n8
         case 0xDF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0018; return 16; } //RST $18
 
         case 0xE0: { memory_write8(cpu->bus, (0xFF00 + cpu_fetch_byte_pc(cpu)), cpu->AF.r8.hi); return 12; } //LDH (a8), A
         case 0xE1: { cpu->HL.r16 = instr_pop(cpu); return 12; } //POP HL
         case 0xE2: { memory_write8(cpu->bus, (0xFF00 + cpu->BC.r8.lo), cpu->AF.r8.hi); return 8; } //LD (C), A
         case 0xE5: { instr_push(cpu, cpu->HL.r16); return 16; } //PUSH HL
-        case 0xE6: return 0;
+        case 0xE6: { instr_and(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //AND A, n8
         case 0xE7: { instr_push(cpu, cpu->PC); cpu->PC = 0x0020; return 16; } //RST $20
-        case 0xE8: return 0;
+        case 0xE8: {int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); cpu->SP = instr_add16imm(cpu, e8); return 16; }; //ADD SP, e8
         case 0xE9: { cpu->PC = cpu->HL.r16; return 4; } //JP HL
         case 0xEA: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->AF.r8.hi); return 16; } //LD (a16), A
-        case 0xEE: return 0;
+        case 0xEE: { instr_xor(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //XOR A, n8
         case 0xEF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0028; return 16; } //RST $28
 
         case 0xF0: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu_fetch_byte_pc(cpu))); return 12; } //LDH A, (n8)
@@ -442,13 +442,13 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xF2: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu->BC.r8.lo)); return 8; } //LD A, (C)
         case 0xF3: { cpu->IME = false; cpu->ei_delay = 0; return 4; } //DI
         case 0xF5: { instr_push(cpu, cpu->AF.r16); return 16; } //PUSH AF
-        case 0xF6: return 0;
+        case 0xF6: { instr_or(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //OR A, n8
         case 0xF7: { instr_push(cpu, cpu->PC); cpu->PC = 0x0030; return 16; } //RST 0x30
-        case 0xF8: return 0;
+        case 0xF8: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); cpu->HL.r16 = instr_add16imm(cpu, e8); return 12; } //LD HL, SP + e8
         case 0xF9: { cpu->SP = cpu->HL.r16; return 8; } //LD SP, HL
         case 0xFA: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu_fetch_word_pc(cpu)); return 16; } //LD A, (a16)
         case 0xFB: { cpu->ei_delay = 2; return 4; } //EI
-        case 0xFE: return 0;
+        case 0xFE: { instr_cp(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //CP A, n8
         case 0xFF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0038; return 16; } //RST $38
 
         default: { fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION"); exit(1); }
