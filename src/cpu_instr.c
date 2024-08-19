@@ -28,3 +28,27 @@ void instr_inc16(uint16_t* r16) {
 
     (*r16)++;
 }
+
+uint8_t instr_inc8(Cpu* cpu, uint8_t data) {
+    if (!cpu) {exit(1);}
+
+    uint8_t res = data + 1;
+
+    cpu_updateFlag(cpu, Z_FLAG, res == 0);
+    cpu_updateFlag(cpu, N_FLAG, false);
+    cpu_updateFlag(cpu, H_FLAG, (data & 0xf) + 1 > 0xf);
+
+    return res;
+}
+
+uint8_t instr_dec8(Cpu* cpu, uint8_t data) {
+    if (!cpu) {exit(1);}
+
+    uint8_t res = data - 1;
+
+    cpu_updateFlag(cpu, Z_FLAG, res == 0);
+    cpu_updateFlag(cpu, N_FLAG, true);
+    cpu_updateFlag(cpu, H_FLAG, (data & 0xf) == 0);
+
+    return res;
+}

@@ -9,5 +9,7 @@ void instr_push(Cpu* cpu, uint16_t r16);
 
 void instr_dec16(uint16_t* r16);
 void instr_inc16(uint16_t* r16);
+uint8_t instr_inc8(Cpu* cpu, uint8_t data);
+uint8_t instr_dec8(Cpu* cpu, uint8_t data);
 
 #endif //__CPU_INSTR_H__
