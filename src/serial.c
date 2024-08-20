@@ -18,7 +18,7 @@ void serial_write(Serial* serial, uint16_t address, uint8_t data) {
 
     switch (address) {
         case 0xFF01: {serial->sb = data; break; }    
-        case 0xFF02: {serial->sc = data | 0x7E; break; }
+        case 0xFF02: {serial->sc = (data | 0x7E); break; } //get only bit7et bit0 from data, useless bit set to 1
         default: { fprintf(stderr, "Error invalid address for serial"); exit(1); }
     }
 }
