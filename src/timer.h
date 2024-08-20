@@ -23,6 +23,6 @@ void timer_init(Timer* timer);
 uint8_t timer_read(Timer* timer, uint16_t address);
 void timer_write(Timer* timer, uint16_t address, uint8_t data);
 
-void timer_ticks(Timer* timer);
+void timer_ticks(Timer* timer, uint32_t ticks);
 
 #endif

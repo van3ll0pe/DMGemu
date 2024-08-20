@@ -36,7 +36,7 @@ uint8_t instr_inc8(Cpu* cpu, uint8_t data) {
 
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
-    cpu_updateFlag(cpu, H_FLAG, (data & 0xf) + 1 > 0xf);
+    cpu_updateFlag(cpu, H_FLAG, ((data & 0xf) + 1) > 0xf);
 
     return res;
 }
@@ -111,7 +111,7 @@ void instr_add16(Cpu* cpu, uint16_t r16) {
     uint16_t res = cpu->HL.r16 + r16;
 
     cpu_updateFlag(cpu, N_FLAG, false);
-    cpu_updateFlag(cpu, H_FLAG, (cpu->HL.r16 & 0xfff) + (r16 & 0xfff) > 0xfff);
+    cpu_updateFlag(cpu, H_FLAG, ((cpu->HL.r16 & 0xfff) + (r16 & 0xfff)) > 0xfff);
     cpu_updateFlag(cpu, C_FLAG, res <  cpu->HL.r16);
 
      cpu->HL.r16 = res;
@@ -122,8 +122,8 @@ uint16_t instr_add16imm(Cpu* cpu, int8_t e8) {
 
     cpu_updateFlag(cpu, Z_FLAG, false);
     cpu_updateFlag(cpu, N_FLAG, false);
-    cpu_updateFlag(cpu, H_FLAG, (cpu->SP & 0xf) + (e8 & 0xf) > 0xf);
-    cpu_updateFlag(cpu, C_FLAG, (cpu->SP & 0xff) + (e8 & 0xff) > 0xff);
+    cpu_updateFlag(cpu, H_FLAG, ((cpu->SP & 0xf) + (e8 & 0xf)) > 0xf);
+    cpu_updateFlag(cpu, C_FLAG, ((cpu->SP & 0xff) + (e8 & 0xff)) > 0xff);
 
     return (cpu->SP + e8);
 }
@@ -135,8 +135,8 @@ void instr_add8(Cpu* cpu, uint8_t data) {
 
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
-    cpu_updateFlag(cpu, H_FLAG, (cpu->AF.r8.hi & 0xf) + (data & 0xf) > 0xf);
-    cpu_updateFlag(cpu, C_FLAG, cpu->AF.r8.hi + data > 0xff);
+    cpu_updateFlag(cpu, H_FLAG, ((cpu->AF.r8.hi & 0xf) + (data & 0xf)) > 0xf);
+    cpu_updateFlag(cpu, C_FLAG, (cpu->AF.r8.hi + data) > 0xff);
 
     cpu->AF.r8.hi = res;
 }
@@ -149,8 +149,8 @@ void instr_adc(Cpu* cpu, uint8_t data) {
 
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
-    cpu_updateFlag(cpu, H_FLAG, (cpu->AF.r8.hi & 0xf) + (data & 0xf) + c > 0xf);
-    cpu_updateFlag(cpu, C_FLAG, cpu->AF.r8.hi + data + c > 0xff);
+    cpu_updateFlag(cpu, H_FLAG, ((cpu->AF.r8.hi & 0xf) + (data & 0xf) + c) > 0xf);
+    cpu_updateFlag(cpu, C_FLAG, (cpu->AF.r8.hi + data + c) > 0xff);
 
     cpu->AF.r8.hi = res;
 }
@@ -176,8 +176,8 @@ void instr_sbc(Cpu* cpu, uint8_t data) {
 
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, true);
-    cpu_updateFlag(cpu, H_FLAG, (cpu->AF.r8.hi & 0xf) < (data & 0xf) + c);
-    cpu_updateFlag(cpu, C_FLAG, cpu->AF.r8.hi < data + c);
+    cpu_updateFlag(cpu, H_FLAG, (cpu->AF.r8.hi & 0xf) < ((data & 0xf) + c));
+    cpu_updateFlag(cpu, C_FLAG, cpu->AF.r8.hi < (data + c));
 
     cpu->AF.r8.hi = res;
 }
@@ -289,7 +289,7 @@ uint8_t instr_sla(Cpu* cpu, uint8_t data) {
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
     cpu_updateFlag(cpu, H_FLAG, false);
-    cpu_updateFlag(cpu, C_FLAG, data & 0x80);
+    cpu_updateFlag(cpu, C_FLAG, (data & 0x80));
 
     return res;
 }
@@ -302,7 +302,7 @@ uint8_t instr_sra(Cpu* cpu, uint8_t data) {
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
     cpu_updateFlag(cpu, H_FLAG, false);
-    cpu_updateFlag(cpu, C_FLAG, data & 0x1);
+    cpu_updateFlag(cpu, C_FLAG, (data & 0x1));
 
     return res;
 }
@@ -328,7 +328,7 @@ uint8_t instr_srl(Cpu* cpu, uint8_t data) {
     cpu_updateFlag(cpu, Z_FLAG, res == 0);
     cpu_updateFlag(cpu, N_FLAG, false);
     cpu_updateFlag(cpu, H_FLAG, false);
-    cpu_updateFlag(cpu, C_FLAG, data & 0x1);
+    cpu_updateFlag(cpu, C_FLAG, (data & 0x1));
 
     return res;
 }
