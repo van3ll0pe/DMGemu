@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 static const uint8_t bootRom[0x100] = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
@@ -23,16 +24,26 @@ static const uint8_t bootRom[0x100] = {
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x00, 0x00, 0x3E, 0x01, 0xE0, 0x50
 };
 
-void memory_init(Memory* memory)
+void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad)
 {
-    if (!memory) {
-        fprintf(stderr, "[ERROR]: memory structure is NULL");
+    if (!memory || !serial || !timer || !joypad) {
+        fprintf(stderr, "[ERROR]: memory initialization failed from structure element");
         exit(1);
     }
 
-    memset(memory->buffer, 0, sizeof(uint8_t) * MEMORY_SIZE);
-    memcpy(memory->bootRom, bootRom, 0x100);
+    memory->joypad = joypad;
+    memory->timer = timer;
+    memory->serial = serial;
+    memory->disable_bootrom = 0x00;
+    memory->interrupt_enable = 0x00;
+    memory->interrupt_requested = 0xE1;
 
+    memset(memory->high_ram, 0, sizeof(uint8_t) * HIGHRAM_SIZE);
+    memset(memory->oam_ram, 0, sizeof(uint8_t) * OAMRAM_SIZE);
+    memset(memory->work_ram, 0, sizeof(uint8_t) * WORKRAM_SIZE);
+
+
+/*
     memory->buffer[P1] = 0xCF;
     memory->buffer[SC] = 0x7E;
     memory->buffer[DIV] = 0xAB;
@@ -59,7 +70,7 @@ void memory_init(Memory* memory)
     memory->buffer[LCDC] = 0x91;
     memory->buffer[STAT] = 0x85;
     memory->buffer[DMA] = 0xFF;
-    memory->buffer[BGP] = 0xFC;
+    memory->buffer[BGP] = 0xFC;*/
 }
 
 uint8_t memory_read8(Memory* memory, uint16_t address)
@@ -69,12 +80,33 @@ uint8_t memory_read8(Memory* memory, uint16_t address)
         exit(1);
     }
 
-    if (address < 0x100 && memory->buffer[0xFF50])
-        return memory->buffer[address];
-    else if (address < 0x100)
-        return memory->bootRom[address];
-    else
-        return memory->buffer[address];
+    switch (address & 0xF000) {
+        //ROM from cartridge
+        case 0x0000:
+        case 0x1000:
+        case 0x2000:
+        case 0x3000:
+        case 0x4000:
+        case 0x5000:
+        case 0x6000:
+        case 0x7000:
+
+        //VRAM ppu
+        case 0x8000:
+        case 0x9000:
+
+        //EXTERNAL RAM from cartridge
+        case 0xA000:
+        case 0xB000:
+
+        //WORK RAM
+        case 0xC000:
+        case 0xD000:
+        
+        case 0xE000:
+        case 0xF000:
+        default: return 0xFF;
+    }
 }
 
 void memory_write8(Memory* memory, uint16_t address, uint8_t data)

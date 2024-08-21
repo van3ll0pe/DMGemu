@@ -2,12 +2,26 @@
 #define __MEMORY_H__
 
 #include <stdint.h>
+#include "timer.h"
+#include "serial.h"
+#include "joypad.h"
 
-#define MEMORY_SIZE 0x10000
+#define WORKRAM_SIZE 0x2000
+#define HIGHRAM_SIZE 0x80
+#define OAMRAM_SIZE 0xA0
 
 typedef struct {
-    uint8_t buffer[MEMORY_SIZE];
-    uint8_t bootRom[0x100];
+    uint8_t interrupt_requested; //IF - FF0F
+    uint8_t interrupt_enable; //IE - FFFF
+    uint8_t disable_bootrom; //FF50
+
+    uint8_t work_ram[WORKRAM_SIZE];
+    uint8_t high_ram[HIGHRAM_SIZE];
+    uint8_t oam_ram[OAMRAM_SIZE];
+    Timer* timer;
+    Serial* serial;
+    Joypad* joypad;
+
 } Memory;
 
 
