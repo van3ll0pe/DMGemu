@@ -7,7 +7,7 @@
 #include "joypad.h"
 
 #define WORKRAM_SIZE 0x2000
-#define HIGHRAM_SIZE 0x80
+#define HIGHRAM_SIZE 0x7F
 #define OAMRAM_SIZE 0xA0
 
 typedef struct {
