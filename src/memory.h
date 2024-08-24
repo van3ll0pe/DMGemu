@@ -25,7 +25,7 @@ typedef struct {
 } Memory;
 
 
-void memory_init(Memory* memory);
+void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad);
 uint8_t memory_read8(Memory* memory, uint16_t address);
 void memory_write8(Memory* memory, uint16_t address, uint8_t data);
 uint16_t memory_read16(Memory* memory, uint16_t address);
