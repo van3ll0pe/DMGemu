@@ -261,7 +261,7 @@ uint16_t memory_read16(Memory* memory, uint16_t address)
         exit(1);
     }
 
-    uint16_t data = (memory_read8(memory, (address + 1)) >> 8) | memory_read8(memory, address); //little endian
+    uint16_t data = (memory_read8(memory, (address + 1)) << 8) | memory_read8(memory, address); //little endian
     return data;
 }
 
