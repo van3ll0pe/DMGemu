@@ -2,7 +2,7 @@
 #include "cpu_instr.h"
 
 uint16_t instr_pop(Cpu* cpu) {
-    if (!cpu) { exit(1); }
+    if (!cpu) { abort(); }
 
     uint16_t r16 = memory_read16(cpu->bus, cpu->SP);
     cpu->SP += 2;
@@ -11,26 +11,26 @@ uint16_t instr_pop(Cpu* cpu) {
 }
 
 void instr_push(Cpu* cpu, uint16_t r16) {
-    if (!cpu) { exit(1); }
+    if (!cpu) { abort(); }
 
     cpu->SP -= 2;
     memory_write16(cpu->bus, cpu->SP, r16);
 }
 
 void instr_dec16(uint16_t* r16) {
-    if (!r16) { exit(1); }
+    if (!r16) { abort(); }
 
     (*r16)--;
 }
 
 void instr_inc16(uint16_t* r16) {
-    if (!r16) { exit(1); }
+    if (!r16) { abort(); }
 
     (*r16)++;
 }
 
 uint8_t instr_inc8(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = data + 1;
 
@@ -42,7 +42,7 @@ uint8_t instr_inc8(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_dec8(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = data - 1;
 
@@ -54,7 +54,7 @@ uint8_t instr_dec8(Cpu* cpu, uint8_t data) {
 }
 
 void instr_scf(Cpu* cpu) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     cpu_updateFlag(cpu, N_FLAG, false);
     cpu_updateFlag(cpu, H_FLAG, false);
@@ -62,7 +62,7 @@ void instr_scf(Cpu* cpu) {
 }
 
 void instr_ccf(Cpu* cpu) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t carry = cpu_getFlag(cpu, C_FLAG) ^ 1;
 
@@ -72,7 +72,7 @@ void instr_ccf(Cpu* cpu) {
 }
 
 void instr_cpl(Cpu* cpu) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     cpu->AF.r8.hi = ~cpu->AF.r8.hi;
 
@@ -81,7 +81,7 @@ void instr_cpl(Cpu* cpu) {
 }
 
 void instr_daa(Cpu* cpu) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     if (cpu_getFlag(cpu, N_FLAG) == 0) { //addition
             if (cpu_getFlag(cpu, C_FLAG) == 1 || cpu->AF.r8.hi > 0x99) {
@@ -106,7 +106,7 @@ void instr_daa(Cpu* cpu) {
 }
 
 void instr_add16(Cpu* cpu, uint16_t r16) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint16_t res = cpu->HL.r16 + r16;
 
@@ -118,7 +118,7 @@ void instr_add16(Cpu* cpu, uint16_t r16) {
 }
 
 uint16_t instr_add16imm(Cpu* cpu, int8_t e8) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint16_t imm = (uint16_t)((int16_t)e8);
 
@@ -131,7 +131,7 @@ uint16_t instr_add16imm(Cpu* cpu, int8_t e8) {
 }
 
 void instr_add8(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = cpu->AF.r8.hi + data;
 
@@ -144,7 +144,7 @@ void instr_add8(Cpu* cpu, uint8_t data) {
 }
 
 void instr_adc(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t c = cpu_getFlag(cpu, C_FLAG);
     uint8_t res = cpu->AF.r8.hi + data + c;
@@ -158,7 +158,7 @@ void instr_adc(Cpu* cpu, uint8_t data) {
 }
 
 void instr_sub(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = cpu->AF.r8.hi - data;
 
@@ -171,7 +171,7 @@ void instr_sub(Cpu* cpu, uint8_t data) {
 }
 
 void instr_sbc(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t c = cpu_getFlag(cpu, C_FLAG);
     uint8_t res = cpu->AF.r8.hi - data - c;
@@ -184,7 +184,7 @@ void instr_sbc(Cpu* cpu, uint8_t data) {
     cpu->AF.r8.hi = res;
 }
 void instr_and(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     cpu->AF.r8.hi &= data;
 
@@ -195,7 +195,7 @@ void instr_and(Cpu* cpu, uint8_t data) {
 }
 
 void instr_xor(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     cpu->AF.r8.hi ^= data;
 
@@ -206,7 +206,7 @@ void instr_xor(Cpu* cpu, uint8_t data) {
 }
 
 void instr_or(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     cpu->AF.r8.hi |= data;
 
@@ -217,7 +217,7 @@ void instr_or(Cpu* cpu, uint8_t data) {
 }
 
 void instr_cp(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = cpu->AF.r8.hi - data;
 
@@ -228,7 +228,7 @@ void instr_cp(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_rlc(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t b7 = data & 0x80;
     uint8_t res = (data << 1) | ((b7) ? 1 : 0);
@@ -242,7 +242,7 @@ uint8_t instr_rlc(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_rrc(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t b0 = data & 0x1;
     uint8_t res = (data >> 1) | ((b0) ? 0x80 : 0);
@@ -256,7 +256,7 @@ uint8_t instr_rrc(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_rl(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t b7 = data & 0x80;
     uint8_t res = (data << 1) | cpu_getFlag(cpu, C_FLAG);
@@ -270,7 +270,7 @@ uint8_t instr_rl(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_rr(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t b0 = data & 0x1;
     uint8_t res = (data >> 1) | ((cpu_getFlag(cpu, C_FLAG)) ? 0x80: 0);
@@ -284,7 +284,7 @@ uint8_t instr_rr(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_sla(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = (data << 1);
 
@@ -297,7 +297,7 @@ uint8_t instr_sla(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_sra(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = (data >> 1) | (data & 0x80);
 
@@ -310,7 +310,7 @@ uint8_t instr_sra(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_swap(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = ((data & 0xf0) >> 4) | ((data & 0x0f) << 4);
 
@@ -323,7 +323,7 @@ uint8_t instr_swap(Cpu* cpu, uint8_t data) {
 }
 
 uint8_t instr_srl(Cpu* cpu, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = (data >> 1);
 
@@ -336,7 +336,7 @@ uint8_t instr_srl(Cpu* cpu, uint8_t data) {
 }
 
 void instr_bit(Cpu* cpu, uint8_t bit, uint8_t data) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     uint8_t res = (1 << bit) & data;
 
@@ -354,7 +354,7 @@ uint8_t instr_set(uint8_t bit, uint8_t data) {
 }
 
 void instr_jr(Cpu* cpu, int8_t e8) {
-    if (!cpu) { exit(1); }
+    if (!cpu) { abort(); }
 
     uint16_t imm = (uint16_t)((int16_t)e8);
 

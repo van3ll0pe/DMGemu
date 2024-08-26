@@ -19,7 +19,7 @@ DEBUG= -DDEBUG
 all: $(EXEC)
 
 DMGemu: $(OBJ_FILES)
-	$(CC) -o $@ $^ $(LDFLAGS) $(DEBUG)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 cpu.o: src/cpu.h src/hard_registers.h src/memory.h src/timer.h \
  src/serial.h src/cartridge/cartridge.h src/joypad.h src/cpu_instr.h

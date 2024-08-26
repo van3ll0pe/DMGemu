@@ -1,6 +1,7 @@
 #include "serial.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 static uint8_t serial_output_terminal(char c) {
     fprintf(stdout, "%c", c);
@@ -9,32 +10,32 @@ static uint8_t serial_output_terminal(char c) {
 }
 
 void serial_init(Serial* serial) {
-    if (!serial) {exit(1);}
+    if (!serial) {abort();}
 
     serial->sb = 0;
-    serial->sc = 0;
+    serial->sc = 0x81;
     serial->interrupt = 0;
 }
 
 void serial_write(Serial* serial, uint16_t address, uint8_t data) {
-    if (!serial) {exit(1);}
+    if (!serial) {abort();}
 
     switch (address) {
         case 0xFF01: {serial->sb = data; break; }    
         case 0xFF02: { serial->sc = (data | 0x7E); 
-                        if (data & 0x81) { serial->sb = serial_output_terminal(serial->sb); serial->sb &= ~0x80; serial->interrupt = 0x8; };
+                        if (data & 0x81) { serial->sb = serial_output_terminal(serial->sb); /*serial->sc &= ~0x80;*/ serial->interrupt = 0x8; };
                         break; } //get only bit7et bit0 from data, useless bit set to 1
-        default: { fprintf(stderr, "Error invalid address for serial"); exit(1); }
+        default: { fprintf(stderr, "Error invalid address for serial"); abort(); }
     }
 }
 
 uint8_t serial_read(Serial* serial, uint16_t address) {
-    if (!serial) {exit(1);}
+    if (!serial) {abort();}
 
     switch (address) {
         case 0xFF01: { return serial->sb; }
         case 0xFF02: { return serial->sc; }
-        default: { fprintf(stderr, "Error invalid address for serial"); exit(1); }
+        default: { fprintf(stderr, "Error invalid address for serial"); abort(); }
     }
 }
 
@@ -42,7 +43,7 @@ uint8_t serial_read(Serial* serial, uint16_t address) {
 
 /*
 void serial_ticks(Serial* serial, uint32_t ticks) {
-    if (!serial) {exit(1);}
+    if (!serial) {abort();}
 
     if ((serial->sc & 0x81) != 0x81) {return ;} //if gameboy serial is not enable and master
 

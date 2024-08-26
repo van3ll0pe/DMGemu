@@ -12,7 +12,7 @@ int main(int ac, char** av)
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         fprintf(stderr, "[Error] : initialization of SDL failed");
-        exit(1);
+        abort();
     }
 
     Gameboy gb;

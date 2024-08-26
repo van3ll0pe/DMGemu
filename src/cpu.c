@@ -7,10 +7,10 @@ void cpu_init(Cpu* cpu, Memory* memory)
 {
     if (!cpu) {
         fprintf(stderr, "[ERROR]: CPU not initialized");
-        exit(1);
+        abort();
     }
 
-    if (!memory) { fprintf(stderr, "[ERROR] : BUS NOT LINKED TO THE CPU"); exit(1);}
+    if (!memory) { fprintf(stderr, "[ERROR] : BUS NOT LINKED TO THE CPU"); abort();}
 
     cpu->bus = memory;
     cpu->PC = 0x100;
@@ -33,7 +33,7 @@ void cpu_init(Cpu* cpu, Memory* memory)
 void cpu_setFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     cpu->AF.r8.lo |= flag;
 }
@@ -41,7 +41,7 @@ void cpu_setFlag(Cpu* cpu, Flag flag)
 void cpu_clearFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     cpu->AF.r8.lo &= (~flag);
 }
@@ -49,7 +49,7 @@ void cpu_clearFlag(Cpu* cpu, Flag flag)
 void cpu_updateFlag(Cpu* cpu, Flag flag, bool condition)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     if (condition)
         cpu_setFlag(cpu, flag);
@@ -60,7 +60,7 @@ void cpu_updateFlag(Cpu* cpu, Flag flag, bool condition)
 uint8_t cpu_getFlag(Cpu* cpu, Flag flag)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     return (cpu->AF.r8.lo & flag) ? 1 : 0;
 }
@@ -69,7 +69,7 @@ uint8_t cpu_getFlag(Cpu* cpu, Flag flag)
 uint8_t cpu_fetch_byte_pc(Cpu* cpu)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     uint8_t data = memory_read8(cpu->bus, cpu->PC);
     cpu->PC++;
@@ -80,7 +80,7 @@ uint8_t cpu_fetch_byte_pc(Cpu* cpu)
 uint16_t cpu_fetch_word_pc(Cpu* cpu)
 {
     if (!cpu)
-        exit(1);
+        abort();
     
     uint16_t data = memory_read16(cpu->bus, cpu->PC);
     cpu->PC += 2;
@@ -88,7 +88,7 @@ uint16_t cpu_fetch_word_pc(Cpu* cpu)
 }
 
 void cpu_update_ei(Cpu* cpu) {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     switch  (cpu->ei_delay) {
         case 2 :    cpu->ei_delay = 1;
@@ -103,7 +103,7 @@ void cpu_update_ei(Cpu* cpu) {
 uint32_t cpu_ticks(Cpu* cpu)
 {
     if (!cpu)
-        exit(1);
+        abort();
 
     cpu_update_ei(cpu);
     
@@ -120,7 +120,7 @@ uint32_t cpu_ticks(Cpu* cpu)
 /********************************   INTERRUPTION MANAGEMENT *******************************************/
 static void handle_interrupt(Cpu* cpu, uint8_t interrupt_type, uint16_t interrupt_address)
 {
-    if (!cpu) {exit(1);}
+    if (!cpu) {abort();}
 
     //clear the bit requesting interrupt
     uint8_t value = memory_read8(cpu->bus, IF);
@@ -135,7 +135,7 @@ static void handle_interrupt(Cpu* cpu, uint8_t interrupt_type, uint16_t interrup
 
 uint32_t handle_interrupts(Cpu* cpu)
 {
-    if (!cpu) { exit(1); }
+    if (!cpu) { abort(); }
 
     uint8_t ie_reg = memory_read8(cpu->bus, IE);
     uint8_t if_reg = memory_read8(cpu->bus, IF);
@@ -187,7 +187,7 @@ uint32_t handle_interrupts(Cpu* cpu)
 uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
 {
     if (!cpu)
-        exit(1);
+        abort();
 
     #ifdef DEBUG
         printf("OPCODE = %2X\n", opcode);
@@ -219,11 +219,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x15: { cpu->DE.r8.hi = instr_dec8(cpu, cpu->DE.r8.hi); return 4; } //DEC D
         case 0x16: { cpu->DE.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD D, n8
         case 0x17: { cpu->AF.r8.hi = instr_rl(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RLA
-        case 0x18: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu);
-                        #ifdef DEBUG
-                         printf("%d", e8);
-                         #endif
-                        instr_jr(cpu, e8); return 12; } //JR e8
+        case 0x18: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); instr_jr(cpu, e8); return 12; } //JR e8
         case 0x19: { instr_add16(cpu, cpu->DE.r16); return 8; } //ADD HL, DE
         case 0x1A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->DE.r16); return 8; } //LD A, (DE)
         case 0x1B: { instr_dec16(&cpu->DE.r16); return 8; } //DEC DE
@@ -232,11 +228,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x1E: { cpu->DE.r8.lo = cpu_fetch_byte_pc(cpu); return 8; } //LD E, n8
         case 0x1F: { cpu->AF.r8.hi = instr_rr(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RRA
 
-        case 0x20: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu);
-                    #ifdef DEBUG
-                         printf("%d", e8);
-                    #endif
-                    if (cpu_getFlag(cpu, Z_FLAG) == 0) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR NZ, e8
+        case 0x20: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 0) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR NZ, e8
         case 0x21: { cpu->HL.r16 = cpu_fetch_word_pc(cpu); return 12; } //LD HL, n16
         case 0x22: { memory_write8(cpu->bus, cpu->HL.r16, cpu->AF.r8.hi); cpu->HL.r16++; return 8; } //LD (HL+), A
         case 0x23: { instr_inc16(&cpu->HL.r16); return 8; } //INC HL
@@ -244,11 +236,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x25: { cpu->HL.r8.hi = instr_dec8(cpu, cpu->HL.r8.hi); return 4; } //DEC H
         case 0x26: { cpu->HL.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD H, n8
         case 0x27: { instr_daa(cpu); return 4; } //DAA
-        case 0x28: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu);
-                    #ifdef DEBUG
-                         printf("%d", e8);
-                    #endif
-                    if (cpu_getFlag(cpu, Z_FLAG) == 1) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR Z, e8
+        case 0x28: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 1) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR Z, e8
 
         case 0x29: { instr_add16(cpu, cpu->HL.r16); return 8; } //ADD HL, HL
         case 0x2A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->HL.r16); cpu->HL.r16++; return 8; } //LD A, (HL+)
@@ -258,11 +246,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x2E: { cpu->HL.r8.lo = cpu_fetch_byte_pc(cpu); return 8; } //LD L, n8
         case 0x2F: { instr_cpl(cpu); return 4; } //CPL
 
-        case 0x30: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu);
-                    #ifdef DEBUG
-                         printf("%d", e8);
-                         #endif
-                    if (cpu_getFlag(cpu, C_FLAG) == 0) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR NC, e8
+        case 0x30: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 0) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR NC, e8
         case 0x31: { cpu->SP = cpu_fetch_word_pc(cpu); return 12; } //LD SP, n16
         case 0x32: { memory_write8(cpu->bus, cpu->HL.r16, cpu->AF.r8.hi); cpu->HL.r16--; return 8; } //LD (HL-), A
         case 0x33: { instr_inc16(&cpu->SP); return 8; } //INC SP
@@ -270,11 +254,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x35: { memory_write8(cpu->bus, cpu->HL.r16, instr_dec8(cpu, memory_read8(cpu->bus, cpu->HL.r16))); return 12; } //DEC (HL)
         case 0x36: { memory_write8(cpu->bus, cpu->HL.r16, cpu_fetch_byte_pc(cpu)); return 12; } //LD (HL), n8
         case 0x37: { instr_scf(cpu); return 4; } //SCF
-        case 0x38: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu);
-                    #ifdef DEBUG
-                         printf("JR immediate 8bit: %d\n", e8); fflush(stdout);
-                         #endif
-                    if (cpu_getFlag(cpu, C_FLAG) == 1) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR C, e8
+        case 0x38: { int8_t e8 = (int8_t)cpu_fetch_byte_pc(cpu); if (cpu_getFlag(cpu, C_FLAG) == 1) { instr_jr(cpu, e8); return 12; } else { return 8; }} //JR C, e8
         case 0x39: { instr_add16(cpu, cpu->SP); return 8; } //ADD HL, SP
         case 0x3A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->HL.r16); cpu->HL.r16--; return 8; } //LD A, (HL-)
         case 0x3B: { instr_dec16(&cpu->SP); return 8; } //DEC SP
@@ -476,14 +456,14 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xFE: { instr_cp(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //CP A, n8
         case 0xFF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0038; return 16; } //RST $38
 
-        default: { fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION"); exit(1); }
+        default: { fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION"); abort(); }
     }
 }
 
 uint32_t cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode)
 {
     if (!cpu)
-        exit(1);
+        abort();
 
     switch (opcode) {
        case 0x00: { cpu->BC.r8.hi = instr_rlc(cpu, cpu->BC.r8.hi); return 8; } //RLC B
@@ -759,6 +739,6 @@ uint32_t cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode)
        case 0xFF: { cpu->AF.r8.hi = instr_set(7, cpu->AF.r8.hi); return 8; } //SET 7, A
 
         default: fprintf(stderr, "[ERROR] : ILLEGAL INSTRUCTION CB");
-                    exit(1);
+                    abort();
     }
 }

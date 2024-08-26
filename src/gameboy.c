@@ -50,7 +50,7 @@ void gameboy_run(Gameboy* gb) {
         gb->memory.interrupt_requested |= gb->joypad.interrupt;
         gb->joypad.interrupt = 0;
 
-        SDL_Delay(60);
+        //SDL_Delay(60);
 
     }
 }

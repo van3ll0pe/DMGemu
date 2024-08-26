@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 void timer_init(Timer* timer) {
-    if (!timer) {exit(1);}
+    if (!timer) {abort();}
 
     timer->clock_speed = 1024; //clock ticks number to increment tima
     timer->div = 0;
@@ -17,18 +17,18 @@ void timer_init(Timer* timer) {
 }
 
 uint8_t timer_read(Timer* timer, uint16_t address) {
-    if (!timer) {exit(1);}
+    if (!timer) {abort();}
 
     switch (address) {
         case 0xFF04: { return timer->div; }
         case 0xFF05: { return timer->tima; }
         case 0xFF06: { return timer->tma; }
         case 0xFF07: { return timer->tac; }
-        default : { fprintf(stderr, "Error: invalid address to read timer"); exit(1);}
+        default : { fprintf(stderr, "Error: invalid address to read timer"); abort();}
     }
 }
 void timer_write(Timer* timer, uint16_t address, uint8_t data) {
-    if (!timer) {exit(1);}
+    if (!timer) {abort();}
 
     switch(address) {
         case 0xFF04: { timer->div = 0; return; }
@@ -39,15 +39,15 @@ void timer_write(Timer* timer, uint16_t address, uint8_t data) {
                                                                         case 0x1: {timer->clock_speed = 16; break; }
                                                                         case 0x2: {timer->clock_speed = 64; break; }
                                                                         case 0x3: {timer->clock_speed = 256; break; }
-                                                                        default: {exit(1);}; }
+                                                                        default: {abort();}; }
                     return;
                     }
-        default : {fprintf(stderr, "Error : invalid address to write timer"); exit(1);}
+        default : {fprintf(stderr, "Error : invalid address to write timer"); abort();}
     }
 }
 
 void timer_ticks(Timer* timer, uint32_t ticks) {
-    if (!timer) {exit(1);}
+    if (!timer) {abort();}
 
     timer->div_cycles += ticks;
     while( timer->div_cycles >= 256) {

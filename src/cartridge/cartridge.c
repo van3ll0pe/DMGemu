@@ -19,16 +19,16 @@ static uint8_t rambank_number(uint8_t data) {
 
 static uint8_t rombank_number(uint8_t data) {
     if (data <= 0x8)
-        return (2 << data);
+        return (2 << (data));
     else
         return 1;
 }
 
 void load_cartridge(Cartridge* cartridge,const char* filename) {
-    if (!cartridge || !filename) { exit(1); }
+    if (!cartridge || !filename) { abort(); }
 
     FILE* file = fopen(filename, "rb");
-    if (!file) { fprintf(stderr, "Error: Cartridge not open"); exit(1); }
+    if (!file) { fprintf(stderr, "Error: Cartridge not open"); abort(); }
 
     fseek(file, 0, SEEK_END);
     cartridge->rom_size = ftell(file);
@@ -36,15 +36,15 @@ void load_cartridge(Cartridge* cartridge,const char* filename) {
 
     
     cartridge->rom = malloc(sizeof(uint8_t) * cartridge->rom_size);
-    if (!cartridge->rom) { fclose(file); fprintf(stderr, "Error malloc cartridge"); exit(1); }
+    if (!cartridge->rom) { fclose(file); fprintf(stderr, "Error malloc cartridge"); abort(); }
 
     fread(cartridge->rom, 1, cartridge->rom_size, file);
     fclose(file);
 
-    if (cartridge->rom_size < 0x150) { free(cartridge->rom); fprintf(stderr, "Error rom_size is too short"); exit(1); }
+    if (cartridge->rom_size < 0x150) { free(cartridge->rom); fprintf(stderr, "Error rom_size is too short"); abort(); }
 
     cartridge->mbc_type = cartridge->rom[0x147]; //get the MBC Type of the cartridge
-    if (cartridge->mbc_type != 0  && cartridge->mbc_type != 1) { free(cartridge->rom); fprintf(stderr, "Error: MBC cartridge unsupported"); exit(1); } //unsupported MBC type cartridge
+    if (cartridge->mbc_type > 0x3) { free(cartridge->rom); fprintf(stderr, "Error: MBC cartridge unsupported"); abort(); } //unsupported MBC type cartridge
 
     cartridge->nbr_ram_bank = rambank_number(cartridge->rom[0x149]);
     cartridge->nbr_rom_bank = rombank_number(cartridge->rom[0x148]);
@@ -60,20 +60,20 @@ void load_cartridge(Cartridge* cartridge,const char* filename) {
     if (cartridge->mbc_type != 0) { //MBC1, etc.
         cartridge->ram_size = cartridge->nbr_ram_bank * 0x2000; //ram size = ram bank number * 8KiB (size of 1 ram bank)
         cartridge->ram = malloc(sizeof(uint8_t) * cartridge->ram_size);
-        if (!cartridge->ram) { free(cartridge->rom); fprintf(stderr, "Error ram size"); exit(1); }
+        if (!cartridge->ram) { free(cartridge->rom); fprintf(stderr, "Error ram size"); abort(); }
         memset(cartridge->ram, 0, sizeof(uint8_t) * cartridge->ram_size);
     }
 }
 
 void eject_cartridge(Cartridge* cartridge) {
-    if (!cartridge) { exit(1); }
+    if (!cartridge) { abort(); }
 
     if (cartridge->rom) { free(cartridge->rom); }
     if (cartridge->ram) { free(cartridge->ram); }
 }
 
 uint8_t cartridge_read(Cartridge* cartridge, uint16_t address) {
-    if (!cartridge) { exit(1); }
+    if (!cartridge) { abort(); }
 
     if (cartridge->mbc_type == 0)
         return cartridge_read_nombc(cartridge, address);
@@ -83,7 +83,7 @@ uint8_t cartridge_read(Cartridge* cartridge, uint16_t address) {
 }
 
 void cartridge_write(Cartridge* cartridge, uint16_t address, uint8_t data) {
-    if (!cartridge) { exit(1); }
+    if (!cartridge) { abort(); }
 
     if (cartridge->mbc_type == 0)
         cartridge_write_nombc(cartridge, address, data);
@@ -93,7 +93,7 @@ void cartridge_write(Cartridge* cartridge, uint16_t address, uint8_t data) {
 
 
 uint8_t cartridge_read_nombc(Cartridge* cartridge, uint16_t address) {
-    if (!cartridge || !cartridge->rom) { exit(1); }
+    if (!cartridge || !cartridge->rom) { abort(); }
 
     if (address >= 0xA000 && address <= 0xBFFF)
         return 0xFF; //NO RAM in noMBC so return default value
@@ -107,61 +107,60 @@ void cartridge_write_nombc(Cartridge* cartridge, uint16_t address, uint8_t data)
 
 
 uint8_t cartridge_read_mbc1(Cartridge* cartridge, uint16_t address) {
-    if (!cartridge || !cartridge->rom) { exit(1); }
+    if (!cartridge || !cartridge->rom) { abort(); }
 
-    if (address < 0x4000) {
-        // Lecture dans la première banque (0x0000 - 0x3FFF)
-        if (cartridge->mode_flag == 0) {
-            return cartridge->rom[address];
-        } else {
-            uint32_t bank_offset = (cartridge->current_ram_bank << 5) % cartridge->nbr_rom_bank;
-            uint32_t rom_address = (bank_offset * 0x4000) + address;
-            return cartridge->rom[rom_address];
-        }
-    } else if (address >= 0x4000 && address < 0x8000) {
-        // Lecture dans une autre banque de ROM (0x4000 - 0x7FFF)
-        uint32_t bank_number = cartridge->current_rom_bank % cartridge->nbr_rom_bank;
-        uint32_t rom_address = (bank_number * 0x4000) + (address - 0x4000);
-        return cartridge->rom[rom_address];
-    } else if (address >= 0xA000 && address < 0xC000) {
-        // Lecture dans la RAM externe (0xA000 - 0xBFFF)
-        if (cartridge->ram_enable) {
-            uint32_t ram_address = (cartridge->current_ram_bank * 0x2000) + (address - 0xA000);
-            return cartridge->ram[ram_address];
-        } else {
-            return 0xFF; // RAM désactivée
-        }
+     if (address >= 0x0000 && address <= 0x3FFF) {
+        return cartridge->rom[address];
     }
-    
-    return 0xFF; // Adresse hors de portée
+
+    if (address >= 0x4000 && address <= 0x7FFF) {
+        uint16_t address_into_bank = address - 0x4000;
+        uint32_t bank_offset = 0x4000 * cartridge->current_rom_bank;
+
+        uint32_t address_in_rom = bank_offset + address_into_bank;
+        return cartridge->rom[address_in_rom];
+    }
+
+    if (address >= 0xA000 && address <= 0xBFFF) {
+        uint16_t offset_into_ram = 0x2000 * cartridge->current_ram_bank;
+        uint16_t address_in_ram = (address - 0xA000) + offset_into_ram;
+        return cartridge->ram[address_in_ram];
+    }
 }
 
 void cartridge_write_mbc1(Cartridge* cartridge, uint16_t address, uint8_t data) {
-    if (!cartridge) { exit(1); }
+    if (!cartridge) { abort(); }
 
-    if (address < 0x2000) {
-        // Active ou désactive la RAM externe
-        if ((data & 0x0F) == 0x0A) {
-            cartridge->ram_enable = true;
-        } else {
-            cartridge->ram_enable = false;
-        }
-    } else if (address >= 0x2000 && address < 0x4000) {
-        // Sélection de la banque ROM (5 bits)
-        cartridge->current_rom_bank = data & 0x1F;
-        if (cartridge->current_rom_bank == 0) {
-            cartridge->current_rom_bank = 1; // La banque 0 ne peut pas être sélectionnée
-        }
-    } else if (address >= 0x4000 && address < 0x6000) {
-        // Sélection de la banque RAM ou bits supplémentaires pour la banque ROM
-        cartridge->current_ram_bank = data & 0x03;
-    } else if (address >= 0x6000 && address < 0x8000) {
-        // Mode de bancage (ROM/RAM)
-        cartridge->mode_flag = data & 0x01;
-    } else if (address >= 0xA000 && address < 0xC000 && cartridge->ram_enable) {
-        // Écriture dans la RAM externe
-        uint32_t ram_address = (cartridge->current_ram_bank * 0x2000) + (address - 0xA000);
-        cartridge->ram[ram_address] = data;
+     if (address >= 0x0000 && address <= 0x1FFF) {
+        cartridge->ram_enable = true;
+    }
+
+    if (address >= 0x2000 && address <= 0x3FFF) {
+        if (data == 0x0) { cartridge->current_rom_bank = 0x1; }
+        if (data == 0x20) { cartridge->current_rom_bank = 0x21; return; }
+        if (data == 0x40) { cartridge->current_rom_bank = 0x41; return; }
+        if (data == 0x60) { cartridge->current_rom_bank = 0x61; return; }
+
+        uint16_t rom_bank_bits = data & 0x1F;
+        cartridge->current_rom_bank = rom_bank_bits;
+    }
+
+    if (address >= 0x4000 && address <= 0x5FFF) {
+        printf("Unimplemented: Setting upper bits of ROM bank number");
+        fflush(stdout);
+    }
+
+    if (address >= 0x6000 && address <= 0x7FFF) {
+        printf("Unimplemented: Selecting ROM/RAM Mode");
+        fflush(stdout);
+    }
+
+    if (address >= 0xA000 && address <= 0xBFFF) {
+        if (!cartridge->ram_enable) { return; }
+
+        uint16_t offset_into_ram = 0x2000 * cartridge->current_ram_bank;
+        uint16_t address_in_ram = (address - 0xA000) + offset_into_ram;
+        cartridge->ram[address_in_ram] = data;
     }
 }
 

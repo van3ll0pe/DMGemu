@@ -28,7 +28,7 @@ void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad, C
 {
     if (!memory || !serial || !timer || !joypad || !cartridge) {
         fprintf(stderr, "[ERROR]: memory initialization failed from structure element");
-        exit(1);
+        abort();
     }
 
     memory->joypad = joypad;
@@ -44,7 +44,7 @@ void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad, C
     memset(memory->work_ram, 0, sizeof(uint8_t) * WORKRAM_SIZE);
 
     memory_write8(memory, P1, 0xCF);
-    memory_write8(memory, SC, 0x7E);
+    //memory_write8(memory, SC, 0x7E);
     memory_write8(memory, DIV, 0xAB);
     memory_write8(memory, TAC, 0xF8);
     memory_write8(memory, IF, 0xE1);
@@ -77,7 +77,7 @@ uint8_t memory_read8(Memory* memory, uint16_t address)
 {
     if (!memory) {
         fprintf(stderr, "[ERROR]: memory structure is NULL");
-        exit(1);
+        abort();
     }
 
     if (address >= 0x0 && address <= 0xFF && !memory->disable_bootrom)
@@ -149,7 +149,7 @@ uint8_t memory_read8(Memory* memory, uint16_t address)
                     else if ((address >= 0xFF01) && (address <= 0xFF02)) { return serial_read(memory->serial, address); }
                     else if ((address >= 0xFF04) && (address <= 0xFF07)) { return timer_read(memory->timer, address); }
                     else if (address == 0xFF0F) { return memory->interrupt_requested; }
-                    else if ((address >= 0xFF40) && (address <= 0xFF4B)) { return 0; } //TODO return ppu_read(ppu, address)}
+                    else if ((address >= 0xFF40) && (address <= 0xFF4B)) { if (address == LY) { return 0x90; } } //TODO return ppu_read(ppu, address)}
                     else if (address == 0xFF50) { return memory->disable_bootrom; }
                     else { return 0xFF; }
                 } 
@@ -167,7 +167,7 @@ void memory_write8(Memory* memory, uint16_t address, uint8_t data)
 {
     if (!memory) {
         fprintf(stderr, "[ERROR]: memory structure is NULL");
-        exit(1);
+        abort();
     }
 
     if (address >= 0x0 && address <= 0xFF && !memory->disable_bootrom)
@@ -258,7 +258,7 @@ uint16_t memory_read16(Memory* memory, uint16_t address)
 {
     if (!memory) {
         fprintf(stderr, "[ERROR]: memory structure is NULL");
-        exit(1);
+        abort();
     }
 
     uint16_t data = (memory_read8(memory, (address + 1)) << 8) | memory_read8(memory, address); //little endian
@@ -269,7 +269,7 @@ void memory_write16(Memory* memory,uint16_t address, uint16_t data)
 {
     if (!memory) {
         fprintf(stderr, "[ERROR]: memory structure is NULL");
-        exit(1);
+        abort();
     }
 
     memory_write8(memory, address, (data & 0xFF));
