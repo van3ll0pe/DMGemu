@@ -44,7 +44,7 @@ void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad, C
     memset(memory->work_ram, 0, sizeof(uint8_t) * WORKRAM_SIZE);
 
     memory_write8(memory, P1, 0xCF);
-    //memory_write8(memory, SC, 0x7E);
+    memory_write8(memory, SC, 0x7E);
     memory_write8(memory, DIV, 0xAB);
     memory_write8(memory, TAC, 0xF8);
     memory_write8(memory, IF, 0xE1);

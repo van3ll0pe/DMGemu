@@ -13,7 +13,7 @@ void serial_init(Serial* serial) {
     if (!serial) {abort();}
 
     serial->sb = 0;
-    serial->sc = 0x81;
+    serial->sc = 0;
     serial->interrupt = 0;
 }
 
@@ -23,7 +23,7 @@ void serial_write(Serial* serial, uint16_t address, uint8_t data) {
     switch (address) {
         case 0xFF01: {serial->sb = data; break; }    
         case 0xFF02: { serial->sc = (data | 0x7E); 
-                        if (data & 0x81) { serial->sb = serial_output_terminal(serial->sb); /*serial->sc &= ~0x80;*/ serial->interrupt = 0x8; };
+                        if (data & 0x81) { serial->sb = serial_output_terminal(serial->sb); serial->sc &= ~0x80; serial->interrupt = 0x8; };
                         break; } //get only bit7et bit0 from data, useless bit set to 1
         default: { fprintf(stderr, "Error invalid address for serial"); abort(); }
     }
