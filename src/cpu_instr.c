@@ -3,7 +3,7 @@
 
 uint16_t instr_pop(Cpu* cpu) {
     if (!cpu) { abort(); }
-
+    
     uint16_t r16 = memory_read16(cpu->bus, cpu->SP);
     cpu->SP += 2;
 

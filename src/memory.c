@@ -109,55 +109,59 @@ uint8_t memory_read8(Memory* memory, uint16_t address)
         //echo work ram
         case 0xE000: { return memory->work_ram[address & 0x1FFF]; }
 
-        case 0xF000: switch (address & 0x0F00) {
-            //echo work ram
-            case 0x000:
-            case 0x100:
-            case 0x200:
-            case 0x300:
-            case 0x400:
-            case 0x500:
-            case 0x600:
-            case 0x700:
-            case 0x800:
-            case 0x900:
-            case 0xA00:
-            case 0xB00:
-            case 0xC00:
-            case 0xD00: { return memory->work_ram[address & 0x1FFF]; }
+        case 0xF000: { 
+            switch (address & 0x0F00) {
+                //echo work ram
+                case 0x000:
+                case 0x100:
+                case 0x200:
+                case 0x300:
+                case 0x400:
+                case 0x500:
+                case 0x600:
+                case 0x700:
+                case 0x800:
+                case 0x900:
+                case 0xA00:
+                case 0xB00:
+                case 0xC00:
+                case 0xD00: { return memory->work_ram[address & 0x1FFF]; }
 
-            case 0xE00: switch (address & 0x00F0) {
-                //OAM
-                case 0x00:
-                case 0x10:
-                case 0x20:
-                case 0x30:
-                case 0x40:
-                case 0x50:
-                case 0x60:
-                case 0x70:
-                case 0x80:
-                case 0x90: { return memory->oam_ram[address - 0xFE00]; }
+                case 0xE00:  { 
+                        switch (address & 0x00F0) {
+                        //OAM
+                        case 0x00:
+                        case 0x10:
+                        case 0x20:
+                        case 0x30:
+                        case 0x40:
+                        case 0x50:
+                        case 0x60:
+                        case 0x70:
+                        case 0x80:
+                        case 0x90: { return memory->oam_ram[address - 0xFE00]; }
 
-                //FEA0 - FEFF range prohibited
+                        //FEA0 - FEFF range prohibited
+                        default: { return 0xFF; }
+                    }
+                }
+
+                case 0xF00: {
+                    if ((address & 0xFF) >= 0x00 && (address & 0xFF) <= 0x7F) { //I/O registers
+                        if (address == 0xFF00) { return joypad_read(memory->joypad, address); }
+                        else if ((address >= 0xFF01) && (address <= 0xFF02)) { return serial_read(memory->serial, address); }
+                        else if ((address >= 0xFF04) && (address <= 0xFF07)) { return timer_read(memory->timer, address); }
+                        else if (address == 0xFF0F) { return memory->interrupt_requested; }
+                        else if ((address >= 0xFF40) && (address <= 0xFF4B)) { if (address == LY) { return 0x90; } } //TODO return ppu_read(ppu, address)}
+                        else if (address == 0xFF50) { return memory->disable_bootrom; }
+                        else { return 0xFF; }
+                    } 
+                    else if ((address & 0xFF) >= 0x80 && (address & 0xFF) <= 0xFE)  { return memory->high_ram[address - 0xFF80]; } //high ram
+                    else { return memory->interrupt_enable; } //IE register
+                }
+
                 default: { return 0xFF; }
             }
-
-            case 0xF00: {
-                if ((address & 0xFF) >= 0x00 && (address & 0xFF) <= 0x7F) { //I/O registers
-                    if (address == 0xFF00) { return joypad_read(memory->joypad, address); }
-                    else if ((address >= 0xFF01) && (address <= 0xFF02)) { return serial_read(memory->serial, address); }
-                    else if ((address >= 0xFF04) && (address <= 0xFF07)) { return timer_read(memory->timer, address); }
-                    else if (address == 0xFF0F) { return memory->interrupt_requested; }
-                    else if ((address >= 0xFF40) && (address <= 0xFF4B)) { if (address == LY) { return 0x90; } } //TODO return ppu_read(ppu, address)}
-                    else if (address == 0xFF50) { return memory->disable_bootrom; }
-                    else { return 0xFF; }
-                } 
-                else if ((address & 0xFF) >= 0x80 && (address & 0xFF) <= 0xFE)  { return memory->high_ram[address & 0x7F]; } //high ram
-                else { return memory->interrupt_enable; } //IE register
-            }
-
-            default: { return 0xFF; }
         }
         default: { return 0xFF; }
     }
@@ -182,22 +186,22 @@ void memory_write8(Memory* memory, uint16_t address, uint8_t data)
         case 0x4000:
         case 0x5000:
         case 0x6000:
-        case 0x7000: { cartridge_write(memory->cartridge, address, data); }
+        case 0x7000: { cartridge_write(memory->cartridge, address, data); return; }
 
         //VRAM ppu
         case 0x8000:
-        case 0x9000: { } //TODO ppu_write(ppu, address)
+        case 0x9000: { return ; } //TODO ppu_write(ppu, address)
 
         //EXTERNAL RAM from cartridge
         case 0xA000:
-        case 0xB000: { cartridge_write(memory->cartridge, address, data); }
+        case 0xB000: { cartridge_write(memory->cartridge, address, data); return; }
 
         //WORK RAM
         case 0xC000:
-        case 0xD000: { memory->work_ram[address & 0x1FFF] = data; }
+        case 0xD000: { memory->work_ram[address & 0x1FFF] = data; return; }
         
         //echo work ram
-        case 0xE000: { memory->work_ram[address & 0x1FFF] = data; }
+        case 0xE000: { memory->work_ram[address & 0x1FFF] = data; return; }
 
         case 0xF000: switch (address & 0x0F00) {
             //echo work ram
@@ -214,7 +218,7 @@ void memory_write8(Memory* memory, uint16_t address, uint8_t data)
             case 0xA00:
             case 0xB00:
             case 0xC00:
-            case 0xD00: { memory->work_ram[address & 0x1FFF] = data; }
+            case 0xD00: { memory->work_ram[address & 0x1FFF] = data; return; }
 
             case 0xE00: switch (address & 0x00F0) {
                 //OAM
@@ -227,7 +231,7 @@ void memory_write8(Memory* memory, uint16_t address, uint8_t data)
                 case 0x60:
                 case 0x70:
                 case 0x80:
-                case 0x90: { memory->oam_ram[address - 0xFE00] = data; }
+                case 0x90: { memory->oam_ram[address - 0xFE00] = data; return; }
 
                 //FEA0 - FEFF range prohibited
                 default: { return; }
@@ -243,8 +247,9 @@ void memory_write8(Memory* memory, uint16_t address, uint8_t data)
                     else if (address == 0xFF50) { memory->disable_bootrom = data; }
                     else { return; }
                 } 
-                else if ((address & 0xFF) >= 0x80 && (address & 0xFF) <= 0xFE)  { memory->high_ram[address & 0x7F] = data; } //high ram
+                else if ((address & 0xFF) >= 0x80 && (address & 0xFF) <= 0xFE)  { memory->high_ram[address - 0xFF80] = data; } //high ram
                 else { memory->interrupt_enable = (data | 0xE0); } //IE register
+                return;
             }
 
             default: { return; }
