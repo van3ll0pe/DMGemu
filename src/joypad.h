@@ -11,7 +11,7 @@ typedef struct  {
     bool buttons_activated;
     uint8_t buttons; //bit 7 = start; bit 6 = select; bit 5 = B; bit 4 = A; bit 3 = down; bit 2 = up; bit 1 = left; bit 0 = right 
     bool exit_gameboy;
-    bool interrupt_request;
+    uint8_t interrupt;
 }Joypad;
 
 void joypad_init(Joypad* joypad);

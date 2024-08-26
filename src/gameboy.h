@@ -6,6 +6,7 @@
 #include "joypad.h"
 #include "serial.h"
 #include "timer.h"
+#include "cartridge.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,14 +21,16 @@ typedef struct {
     Joypad joypad;
     Serial serial;
     Timer timer;
+    Cartridge cartridge;
+
 
     SDL_Window* window;
     SDL_Renderer* render;
-    SDL_Texture* texture;
 } Gameboy;
 
-bool gameboy_init(Gameboy* gb);
+bool gameboy_init(Gameboy* gb, const char* filename);
 bool gameboy_draw(Gameboy* gb);
-bool gameboy_run(Gameboy* gb);
+void gameboy_run(Gameboy* gb);
+void gameboy_quit(Gameboy* gb);
 
 #endif

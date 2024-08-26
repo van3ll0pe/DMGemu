@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "timer.h"
 #include "serial.h"
+#include "cartridge.h"
 #include "joypad.h"
 
 #define WORKRAM_SIZE 0x2000
@@ -21,11 +22,11 @@ typedef struct {
     Timer* timer;
     Serial* serial;
     Joypad* joypad;
-
+    Cartridge* cartridge;
 } Memory;
 
 
-void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad);
+void memory_init(Memory* memory, Serial* serial, Timer* timer, Joypad* joypad, Cartridge* cartridge);
 uint8_t memory_read8(Memory* memory, uint16_t address);
 void memory_write8(Memory* memory, uint16_t address, uint8_t data);
 uint16_t memory_read16(Memory* memory, uint16_t address);

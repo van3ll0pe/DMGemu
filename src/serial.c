@@ -2,15 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static uint8_t serial_output_terminal(char c) {
+    fprintf(stdout, "%c", c);
+    fflush(stdout);
+    return 0;
+}
+
 void serial_init(Serial* serial) {
     if (!serial) {exit(1);}
 
     serial->sb = 0;
     serial->sc = 0;
-    serial->bit_counter = 0;
-    serial->clock_speed = 512; //clock ticks.
-    serial->internal_clock = 0;
-    serial->interrupt_request = false;
+    serial->interrupt = 0;
 }
 
 void serial_write(Serial* serial, uint16_t address, uint8_t data) {
@@ -18,7 +21,9 @@ void serial_write(Serial* serial, uint16_t address, uint8_t data) {
 
     switch (address) {
         case 0xFF01: {serial->sb = data; break; }    
-        case 0xFF02: {serial->sc = (data | 0x7E); break; } //get only bit7et bit0 from data, useless bit set to 1
+        case 0xFF02: { serial->sc = (data | 0x7E); 
+                        if (data & 0x81) { serial->sb = serial_output_terminal(serial->sb); serial->sb &= ~0x80; serial->interrupt = 0x8; };
+                        break; } //get only bit7et bit0 from data, useless bit set to 1
         default: { fprintf(stderr, "Error invalid address for serial"); exit(1); }
     }
 }
@@ -33,12 +38,9 @@ uint8_t serial_read(Serial* serial, uint16_t address) {
     }
 }
 
-static uint8_t serial_output_terminal(char c) {
-    printf("%c", c);
-    fflush(stdout);
-    return 0;
-}
 
+
+/*
 void serial_ticks(Serial* serial, uint32_t ticks) {
     if (!serial) {exit(1);}
 
@@ -55,4 +57,4 @@ void serial_ticks(Serial* serial, uint32_t ticks) {
             serial->sc &= ~0x80;
         }
     }
-}
+}*/

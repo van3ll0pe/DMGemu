@@ -10,7 +10,7 @@ void joypad_init(Joypad* joypad) {
     joypad->buttons_activated = true;
     joypad->p1 = 0xcf;
     joypad->exit_gameboy = false;
-    joypad->interrupt_request = false;
+    joypad->interrupt = 0;
 }
 
 uint8_t joypad_read(Joypad* joypad, uint16_t address) {
@@ -92,7 +92,7 @@ void joypad_update(Joypad* joypad) {
     }
 
     if ( (current_state & ~(new_state)) != 0) {//request interrupt key pressed
-        joypad->interrupt_request = true;
+        joypad->interrupt = 0x10;
     }
 
     joypad->p1 = (joypad->p1 & 0xf0) | (new_state & 0xf);

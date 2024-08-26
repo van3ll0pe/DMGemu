@@ -16,7 +16,7 @@ typedef struct {
     uint32_t div_cycles;
     uint32_t tima_cycles;
 
-    bool interrupt_request;
+    uint8_t interrupt;
 } Timer;
 
 void timer_init(Timer* timer);
