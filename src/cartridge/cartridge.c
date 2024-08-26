@@ -126,6 +126,8 @@ uint8_t cartridge_read_mbc1(Cartridge* cartridge, uint16_t address) {
         uint16_t address_in_ram = (address - 0xA000) + offset_into_ram;
         return cartridge->ram[address_in_ram];
     }
+
+    return 0xFF;
 }
 
 void cartridge_write_mbc1(Cartridge* cartridge, uint16_t address, uint8_t data) {

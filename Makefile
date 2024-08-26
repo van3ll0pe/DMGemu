@@ -15,6 +15,7 @@ OBJ_FILES= $(SRC_FILES:.c=.o)
 EXEC= DMGemu
 FLAGS= -g
 DEBUG= -DDEBUG
+WARNING= -Wall -Werror
 
 all: $(EXEC)
 
@@ -40,7 +41,7 @@ timer.o: src/timer.h
 cartridge.o: src/cartridge/cartridge.h
 
 %.o: %.c
-	$(CC) -o $@ -c $< $(INCLUDEDIR) $(FLAGS)
+	$(CC) -o $@ -c $< $(INCLUDEDIR) $(FLAGS) $(WARNING)
 
 .PHONY: clean cleanAll
 
