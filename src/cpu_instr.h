@@ -37,5 +37,5 @@ uint8_t instr_srl(Cpu* cpu, uint8_t data);
 void instr_bit(Cpu* cpu, uint8_t bit, uint8_t data);
 uint8_t instr_res(uint8_t bit, uint8_t data);
 uint8_t instr_set(uint8_t bit, uint8_t data);
-
+void instr_jr(Cpu* cpu, int8_t e8);
 #endif //__CPU_INSTR_H__

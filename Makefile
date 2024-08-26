@@ -14,18 +14,27 @@ SRC_FILES= src/gameboy.c \
 OBJ_FILES= $(SRC_FILES:.c=.o)
 EXEC= DMGemu
 FLAGS= -g
+DEBUG= -DDEBUG
 
 all: $(EXEC)
 
 DMGemu: $(OBJ_FILES)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(DEBUG)
 
-cpu.o: src/cpu.h src/hard_registers.h src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h src/cpu_instr.h
-cpu_instr.o: src/cpu.h src/hard_registers.h src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h src/cpu_instr.h
-gameboy.o: src/gameboy.h src/cpu.h src/hard_registers.h src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h
+cpu.o: src/cpu.h src/hard_registers.h src/memory.h src/timer.h \
+ src/serial.h src/cartridge/cartridge.h src/joypad.h src/cpu_instr.h
+cpu_instr.o: src/cpu.h src/hard_registers.h src/memory.h \
+ src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h \
+ src/cpu_instr.h
+gameboy.o: src/gameboy.h src/cpu.h src/hard_registers.h \
+ src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h \
+ src/joypad.h
 joypad.o: src/joypad.h
-main.o: src/gameboy.h src/cpu.h src/hard_registers.h src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h
-memory.o: src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h src/joypad.h src/hard_registers.h
+main.o: src/gameboy.h src/cpu.h src/hard_registers.h \
+ src/memory.h src/timer.h src/serial.h src/cartridge/cartridge.h \
+ src/joypad.h
+memory.o: src/memory.h src/timer.h src/serial.h \
+ src/cartridge/cartridge.h src/joypad.h src/hard_registers.h
 serial.o: src/serial.h
 timer.o: src/timer.h
 cartridge.o: src/cartridge/cartridge.h

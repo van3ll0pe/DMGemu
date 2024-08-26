@@ -120,12 +120,14 @@ void instr_add16(Cpu* cpu, uint16_t r16) {
 uint16_t instr_add16imm(Cpu* cpu, int8_t e8) {
     if (!cpu) {exit(1);}
 
+    uint16_t imm = (uint16_t)((int16_t)e8);
+
     cpu_updateFlag(cpu, Z_FLAG, false);
     cpu_updateFlag(cpu, N_FLAG, false);
     cpu_updateFlag(cpu, H_FLAG, ((cpu->SP & 0xf) + (e8 & 0xf)) > 0xf);
     cpu_updateFlag(cpu, C_FLAG, ((cpu->SP & 0xff) + (e8 & 0xff)) > 0xff);
 
-    return (cpu->SP + e8);
+    return (uint16_t)(cpu->SP + imm);
 }
 
 void instr_add8(Cpu* cpu, uint8_t data) {
@@ -349,4 +351,12 @@ uint8_t instr_res(uint8_t bit, uint8_t data) {
 
 uint8_t instr_set(uint8_t bit, uint8_t data) {
     return data | (1 << bit);
+}
+
+void instr_jr(Cpu* cpu, int8_t e8) {
+    if (!cpu) { exit(1); }
+
+    uint16_t imm = (uint16_t)((int16_t)e8);
+
+    cpu->PC += imm;
 }
