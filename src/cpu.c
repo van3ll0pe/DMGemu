@@ -28,6 +28,7 @@ void cpu_init(Cpu* cpu, Memory* memory)
     cpu->IME = true;
     cpu->is_HALT = false;
     cpu->ei_delay = 0;
+    cpu->di_delay = 0;
 }
 
 void cpu_setFlag(Cpu* cpu, Flag flag)
@@ -99,6 +100,16 @@ void cpu_update_ei(Cpu* cpu) {
         default:    cpu->ei_delay = 0;
                     break;
     }
+
+    switch (cpu->di_delay) {
+        case 2: cpu->di_delay = 1;
+                break;
+        case 1: cpu->di_delay = 0;
+                cpu->IME = false;
+                break;
+        default: cpu->di_delay = 0;
+                 break;
+    }
 }
 
 uint32_t cpu_ticks(Cpu* cpu)
@@ -119,15 +130,11 @@ uint32_t cpu_ticks(Cpu* cpu)
     return cpu_execute_instruction(cpu, opcode);
 }
 /********************************   INTERRUPTION MANAGEMENT *******************************************/
-static void handle_interrupt(Cpu* cpu, uint8_t interrupt_type, uint16_t interrupt_address)
+static void handle_interrupt(Cpu* cpu, uint16_t interrupt_address)
 {
     if (!cpu) {abort();}
 
     //clear the bit requesting interrupt
-    uint8_t value = memory_read8(cpu->bus, IF);
-    value &= ~interrupt_type;
-    memory_write8(cpu->bus, IF, value);
-
     instr_push(cpu, cpu->PC);
     cpu->PC = interrupt_address;
 
@@ -151,27 +158,27 @@ uint32_t handle_interrupts(Cpu* cpu)
     
     //VBLANK
     if (VBLANK & requested_interrupt) {
-        handle_interrupt(cpu, VBLANK, VBLANK_ADDR);
+        handle_interrupt(cpu, VBLANK_ADDR);
         return 20;
     }
     //LCD
     if (LCD & requested_interrupt) {
-        handle_interrupt(cpu, LCD, LCD_ADDR);
+        handle_interrupt(cpu, LCD_ADDR);
         return 20;
     }
     //TIMER
     if (TIMER & requested_interrupt) {
-        handle_interrupt(cpu, TIMER, TIMER_ADDR);
+        handle_interrupt(cpu, TIMER_ADDR);
         return 20;
     }
     //SERIAL
     if (SERIAL & requested_interrupt) {
-        handle_interrupt(cpu, SERIAL, SERIAL_ADDR);
+        handle_interrupt(cpu, SERIAL_ADDR);
         return 20;
     }
     //JOYPAD
     if (JOYPAD & requested_interrupt) {
-        handle_interrupt(cpu, JOYPAD, JOYPAD_ADDR);
+        handle_interrupt(cpu, JOYPAD_ADDR);
         return 20;
     }
 
@@ -441,7 +448,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xF0: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu_fetch_byte_pc(cpu))); return 12; } //LDH A, (n8)
         case 0xF1: { cpu->AF.r16 = instr_pop(cpu) & 0xFFF0; return 12; } //POP AF (set 4low bits to 0)
         case 0xF2: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu->BC.r8.lo)); return 8; } //LD A, (C)
-        case 0xF3: { cpu->IME = false; cpu->ei_delay = 0; return 4; } //DI
+        case 0xF3: { cpu->di_delay = 2; return 4; } //DI
         case 0xF5: { instr_push(cpu, cpu->AF.r16); return 16; } //PUSH AF
         case 0xF6: { instr_or(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //OR A, n8
         case 0xF7: { instr_push(cpu, cpu->PC); cpu->PC = 0x0030; return 16; } //RST 0x30

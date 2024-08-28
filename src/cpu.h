@@ -59,6 +59,7 @@ typedef struct {
     bool IME;
     bool is_HALT;
     uint8_t ei_delay;
+    uint8_t di_delay;
 
     Memory* bus;
 
