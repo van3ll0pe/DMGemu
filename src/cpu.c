@@ -96,7 +96,8 @@ void cpu_update_ei(Cpu* cpu) {
         case 1 :    cpu->ei_delay =  0;
                     cpu->IME = true;
                     break;
-        default:    break;
+        default:    cpu->ei_delay = 0;
+                    break;
     }
 }
 
@@ -143,12 +144,7 @@ uint32_t handle_interrupts(Cpu* cpu)
 
     if (requested_interrupt == 0x0) return 0;
 
-    if (cpu->is_HALT == true) { //halt is desactivated if interrupt is requested even if EMI is false
-        cpu->is_HALT = false;
-
-        if (cpu->IME == false) { //HALTBUG
-        }
-    }
+    cpu->is_HALT = false;
 
     if (cpu->IME == false)
         return 0;
@@ -443,7 +439,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xEF: { instr_push(cpu, cpu->PC); cpu->PC = 0x0028; return 16; } //RST $28
 
         case 0xF0: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu_fetch_byte_pc(cpu))); return 12; } //LDH A, (n8)
-        case 0xF1: { cpu->AF.r16 = instr_pop(cpu); return 12; } //POP AF
+        case 0xF1: { cpu->AF.r16 = instr_pop(cpu) & 0xFFF0; return 12; } //POP AF (set 4low bits to 0)
         case 0xF2: { cpu->AF.r8.hi = memory_read8(cpu->bus, (0xFF00 + cpu->BC.r8.lo)); return 8; } //LD A, (C)
         case 0xF3: { cpu->IME = false; cpu->ei_delay = 0; return 4; } //DI
         case 0xF5: { instr_push(cpu, cpu->AF.r16); return 16; } //PUSH AF

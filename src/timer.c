@@ -6,7 +6,7 @@ void timer_init(Timer* timer) {
     if (!timer) {abort();}
 
     timer->clock_speed = 1024; //clock ticks number to increment tima
-    timer->div = 0;
+    timer->div = 0xAB;
     timer->div_cycles = 0;
     timer->tac = 0;
     timer->tima = 0;
@@ -34,7 +34,7 @@ void timer_write(Timer* timer, uint16_t address, uint8_t data) {
         case 0xFF04: { timer->div = 0; return; }
         case 0xFF05: { timer->tima = data; return; }
         case 0xFF06: { timer->tma = data; return; }
-        case 0xFF07: { timer->tac = (data | 0xF8); timer->enabled = data & 0x4; switch (data & 0x3) { //0xF8 mask is to put useless bit to 1 and only get useful bit from data
+        case 0xFF07: { timer->tac = (data | 0xF8); timer->enabled = (data & 0x4) != 0; switch (data & 0x3) { //0xF8 mask is to put useless bit to 1 and only get useful bit from data
                                                                         case 0x0: {timer->clock_speed = 1024; break; }
                                                                         case 0x1: {timer->clock_speed = 16; break; }
                                                                         case 0x2: {timer->clock_speed = 64; break; }
