@@ -205,7 +205,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x05: { cpu->BC.r8.hi = instr_dec8(cpu, cpu->BC.r8.hi); return 4; } //DEC B
         case 0x06: { cpu->BC.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD B, n8
         case 0x07: { cpu->AF.r8.hi = instr_rlc(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RLCA
-        case 0x08: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->SP); return 25; } //LD (a16), SP
+        case 0x08: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->SP); return 20; } //LD (a16), SP
         case 0x09: { instr_add16(cpu, cpu->BC.r16); return 8; } //ADD HL, BC
         case 0x0A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->BC.r16); return 8; } //LD A, (BC)
         case 0x0B: { instr_dec16(&cpu->BC.r16); return 8; } //DEC BC
@@ -413,7 +413,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0xC8: { if (cpu_getFlag(cpu, Z_FLAG) == 1) { cpu->PC = instr_pop(cpu); return 20; } else { return 8; } } //RET Z
         case 0xC9: { cpu->PC = instr_pop(cpu); return 16; } //RET
         case 0xCA: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 1) { cpu->PC = a16; return 16; } else { return 12; }} //JP Z, a16
-        case 0xCB: { uint8_t opcb = cpu_fetch_byte_pc(cpu); return cpu_execute_instruction_CB(cpu, opcb) + 4; } //PREFIX CB
+        case 0xCB: { uint8_t opcb = cpu_fetch_byte_pc(cpu); return cpu_execute_instruction_CB(cpu, opcb); } //PREFIX CB
         case 0xCC: { uint16_t a16 = cpu_fetch_word_pc(cpu); if (cpu_getFlag(cpu, Z_FLAG) == 1) {instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } else { return 12; }} //CALL Z, a16
         case 0xCD: { uint16_t a16 = cpu_fetch_word_pc(cpu); instr_push(cpu, cpu->PC); cpu->PC = a16; return 24; } //CALL a16
         case 0xCE: { instr_adc(cpu, cpu_fetch_byte_pc(cpu)); return 8; } //ADC A, n8
