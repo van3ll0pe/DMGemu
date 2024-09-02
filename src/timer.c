@@ -50,6 +50,7 @@ void timer_ticks(Timer* timer, uint32_t ticks) {
     if (!timer) {abort();}
 
     timer->div_cycles += ticks;
+
     while( timer->div_cycles >= 256) {
         timer->div++;
         timer->div_cycles -= 256;

@@ -88,7 +88,7 @@ uint16_t cpu_fetch_word_pc(Cpu* cpu)
     return data;
 }
 
-void cpu_update_ei(Cpu* cpu) {
+void cpu_update_ime(Cpu* cpu) {
     if (!cpu) {abort();}
 
     switch  (cpu->ei_delay) {
@@ -117,7 +117,7 @@ uint32_t cpu_ticks(Cpu* cpu)
     if (!cpu)
         abort();
 
-    cpu_update_ei(cpu);
+    cpu_update_ime(cpu);
     
     uint32_t ticks = handle_interrupts(cpu);
     switch (ticks) {case 0 : break; default: return ticks;}
@@ -130,14 +130,14 @@ uint32_t cpu_ticks(Cpu* cpu)
     return cpu_execute_instruction(cpu, opcode);
 }
 /********************************   INTERRUPTION MANAGEMENT *******************************************/
-static void handle_interrupt(Cpu* cpu, uint16_t interrupt_address)
+static void handle_interrupt(Cpu* cpu, uint16_t interrupt_address, uint8_t interrupt_type, uint8_t reg_if)
 {
     if (!cpu) {abort();}
 
     //clear the bit requesting interrupt
     instr_push(cpu, cpu->PC);
     cpu->PC = interrupt_address;
-
+    memory_write8(cpu->bus, 0xFF0F, reg_if & ~(interrupt_type));
     cpu->IME = false;
 }
 
@@ -149,7 +149,7 @@ uint32_t handle_interrupts(Cpu* cpu)
     uint8_t if_reg = memory_read8(cpu->bus, IF);
     uint8_t requested_interrupt = ie_reg & if_reg;
 
-    if (requested_interrupt == 0x0) return 0;
+    if ((requested_interrupt & 0x1F) == 0x0) return 0;
 
     cpu->is_HALT = false;
 
@@ -158,28 +158,28 @@ uint32_t handle_interrupts(Cpu* cpu)
     
     //VBLANK
     if (VBLANK & requested_interrupt) {
-        handle_interrupt(cpu, VBLANK_ADDR);
-        return 20;
+        handle_interrupt(cpu, VBLANK_ADDR, 1, if_reg);
+        return 25;
     }
     //LCD
     if (LCD & requested_interrupt) {
-        handle_interrupt(cpu, LCD_ADDR);
-        return 20;
+        handle_interrupt(cpu, LCD_ADDR, 2, if_reg);
+        return 25;
     }
     //TIMER
     if (TIMER & requested_interrupt) {
-        handle_interrupt(cpu, TIMER_ADDR);
-        return 20;
+        handle_interrupt(cpu, TIMER_ADDR, 4, if_reg);
+        return 25;
     }
     //SERIAL
     if (SERIAL & requested_interrupt) {
-        handle_interrupt(cpu, SERIAL_ADDR);
-        return 20;
+        handle_interrupt(cpu, SERIAL_ADDR, 8, if_reg);
+        return 25;
     }
     //JOYPAD
     if (JOYPAD & requested_interrupt) {
-        handle_interrupt(cpu, JOYPAD_ADDR);
-        return 20;
+        handle_interrupt(cpu, JOYPAD_ADDR, 16, if_reg);
+        return 25;
     }
 
     return 0;
@@ -205,7 +205,7 @@ uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode)
         case 0x05: { cpu->BC.r8.hi = instr_dec8(cpu, cpu->BC.r8.hi); return 4; } //DEC B
         case 0x06: { cpu->BC.r8.hi = cpu_fetch_byte_pc(cpu); return 8; } //LD B, n8
         case 0x07: { cpu->AF.r8.hi = instr_rlc(cpu, cpu->AF.r8.hi); cpu_updateFlag(cpu, Z_FLAG, false); return 4; } //RLCA
-        case 0x08: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->SP); return 20; } //LD (a16), SP
+        case 0x08: { memory_write16(cpu->bus, cpu_fetch_word_pc(cpu), cpu->SP); return 25; } //LD (a16), SP
         case 0x09: { instr_add16(cpu, cpu->BC.r16); return 8; } //ADD HL, BC
         case 0x0A: { cpu->AF.r8.hi = memory_read8(cpu->bus, cpu->BC.r16); return 8; } //LD A, (BC)
         case 0x0B: { instr_dec16(&cpu->BC.r16); return 8; } //DEC BC

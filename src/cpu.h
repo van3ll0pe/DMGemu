@@ -70,7 +70,7 @@ void cpu_init(Cpu* cpu, Memory* memory);
 uint32_t cpu_execute_instruction(Cpu* cpu, uint8_t opcode);
 uint32_t cpu_execute_instruction_CB(Cpu* cpu, uint8_t opcode);
 
-void cpu_update_ei(Cpu* cpu);
+void cpu_update_ime(Cpu* cpu);
 uint32_t cpu_ticks(Cpu* cpu);
 
 
